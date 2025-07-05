@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import pathlib
+from typing import Optional
 
 
 class AppLogger:
@@ -16,9 +17,9 @@ class AppLogger:
             log_dir.mkdir(exist_ok=True)
 
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            log_file_path = log_dir / f"{timestamp}.log"
+            cls._log_file_path = log_dir / f"{timestamp}.log"
 
-            file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
+            file_handler = logging.FileHandler(cls._log_file_path, encoding="utf-8")
             stream_handler = logging.StreamHandler()
 
             file_handler.setLevel(logging.DEBUG)
@@ -36,3 +37,7 @@ class AppLogger:
             cls._logger.addHandler(stream_handler)
 
         return cls._logger
+
+    @classmethod
+    def get_log_file_path(cls) -> Optional[pathlib.Path]:
+        return cls._log_file_path
