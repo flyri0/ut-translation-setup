@@ -1,6 +1,6 @@
 import pathlib
 import tkinter as tk
-from typing import Literal, Dict
+from typing import Literal, Type, Optional
 
 from screeninfo import get_monitors
 
@@ -8,6 +8,10 @@ from pages.welcome import WelcomePage
 from pages.select_path import SelectPathPage
 
 AvailablePages = Literal["WelcomePage", "SelectPathPage"]
+PagesClassMap = {
+    "WelcomePage": WelcomePage,
+    "SelectPathPage": SelectPathPage,
+}
 
 class AppController(tk.Tk):
     def __init__(self):
@@ -18,22 +22,21 @@ class AppController(tk.Tk):
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        container = tk.Frame(self)
-        container.grid(row=0, column=0, sticky="nsew")
+        self.container = tk.Frame(self)
+        self.container.grid(row=0, column=0, sticky="nsew")
 
-
-        self.pages: Dict[AvailablePages, tk.Frame] = {}
-        for Page in (WelcomePage, SelectPathPage):
-            name: AvailablePages = Page.__name__ # type: ignore
-            page = Page(parent=container, controller=self)
-            self.pages[name] = page
-            page.grid(row=0, column=0, sticky="nsew")
-
+        self.current_page: Optional[tk.Frame] = None
         self.show_page("WelcomePage")
 
     def show_page(self, name: AvailablePages):
-        page = self.pages[name]
-        page.tkraise()
+        if self.current_page is not None:
+            self.current_page.destroy()
+
+        page_class: Type[tk.Frame] = PagesClassMap[name]
+        page = page_class(parent=self.container, controller=self)
+        page.grid(row=0, column=0, sticky="nsew")
+
+        self.current_page = page
 
     def _center_window(self):
         screen_width, screen_height = None, None
