@@ -1,14 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from main import AppController
+from pages.base import BasePage
 
-class SelectPathPage(tk.Frame):
-    def __init__(self, parent, controller: 'AppController'):
-        super().__init__(parent)
-        self.controller: 'AppController' = controller
+class SelectPathPage(BasePage):
+    def __init__(self, parent, controller):
+        super().__init__(parent, controller)
 
         tk.Label(self, text="Selecione o caminho").pack()
         ttk.Button(self, text="Voltar", command=lambda: controller.show_page("WelcomePage")).pack()
