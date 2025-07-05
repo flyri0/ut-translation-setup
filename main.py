@@ -1,14 +1,16 @@
 import pathlib
 import tkinter as tk
-from typing import Literal, Type, Optional
+from typing import Literal, Type, Optional, Dict
 
 from screeninfo import get_monitors
 
+from pages.base import BasePage
 from pages.welcome import WelcomePage
 from pages.select_path import SelectPathPage
 
+# Keep this in sync with PageClassMap
 AvailablePages = Literal["WelcomePage", "SelectPathPage"]
-PagesClassMap = {
+PagesClassMap: Dict[str, Type[BasePage]] = {
     "WelcomePage": WelcomePage,
     "SelectPathPage": SelectPathPage,
 }
@@ -29,6 +31,9 @@ class AppController(tk.Tk):
         self.show_page("WelcomePage")
 
     def show_page(self, name: AvailablePages):
+        if name not in PagesClassMap:
+            raise ValueError(f"Invalid page name: {name}")
+
         if self.current_page is not None:
             self.current_page.destroy()
 
