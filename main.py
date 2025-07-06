@@ -106,16 +106,15 @@ class AppController(tk.Tk):
             self.logger.warning(f"Failed to set application icon: {icon_error}")
 
 if __name__ == "__main__":
+    logger = AppLogger.get_logger()
     try:
         app = AppController()
         app.mainloop()
     except Exception as e:
-        logger = AppLogger.get_logger()
         logger.exception("Unhandled exception occurred during runtime")
         tk.messagebox.showerror(
             "Ocorreu um erro inesperado",
             f"Um arquivo de log foi gerado em: {AppLogger.get_log_file_path()}"
         )
     finally:
-        logger = AppLogger.get_logger()
         logger.info("Application closed")
