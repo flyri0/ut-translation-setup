@@ -22,7 +22,7 @@ class AppController(tk.Tk):
     def __init__(self):
         super().__init__()
         self.logger = AppLogger.get_logger()
-        self.logger.info("Appplication initialized")
+        self.logger.info("Application initialized")
 
         self._center_window()
         self._set_icon()
@@ -33,7 +33,6 @@ class AppController(tk.Tk):
         self.container = tk.Frame(self)
         self.container.grid(row=0, column=0, sticky="nsew")
 
-        # TODO: Finish the controllers system
         controls_container = ttk.Frame(self)
         controls_container.grid(row=1, column=0, sticky="ew")
         controls_container.grid_columnconfigure(0, weight=1)
