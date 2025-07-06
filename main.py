@@ -1,5 +1,6 @@
 import pathlib
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.messagebox
 from typing import Literal, Type, Optional, Dict
 
@@ -28,10 +29,10 @@ class AppController(tk.Tk):
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        self.container = tk.Frame(self)
+        self.container = ttk.Frame(self)
         self.container.grid(row=0, column=0, sticky="nsew")
 
-        self.current_page: Optional[tk.Frame] = None
+        self.current_page: Optional[ttk.Frame] = None
         self.show_page("WelcomePage")
 
     def show_page(self, name: AvailablePages):
@@ -45,7 +46,7 @@ class AppController(tk.Tk):
             self.logger.debug(f"Destroying current page: {type(self.current_page).__name__}")
             self.current_page.destroy()
 
-        page_class: Type[tk.Frame] = PagesClassMap[name]
+        page_class: Type[ttk.Frame] = PagesClassMap[name]
         page = page_class(parent=self.container, controller=self)
         self.logger.debug(f"Instantiated page: {type(page).__name__}")
         page.grid(row=0, column=0, sticky="nsew")
