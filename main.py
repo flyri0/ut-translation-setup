@@ -32,6 +32,8 @@ class AppController(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.container = tk.Frame(self)
         self.container.grid(row=0, column=0, sticky="nsew")
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
         controls_container = ttk.Frame(self)
         controls_container.grid(row=1, column=0, sticky="ew")
