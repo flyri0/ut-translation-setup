@@ -22,7 +22,7 @@ class AppController(tk.Tk):
     def __init__(self):
         super().__init__()
         self.logger = AppLogger.get_logger()
-        self.logger.info("App initialized")
+        self.logger.info("Appplication initialized")
 
         self._center_window()
         self._set_icon()
@@ -42,10 +42,14 @@ class AppController(tk.Tk):
 
         ttk.Separator(controls_container, orient="horizontal").grid(row=0, column=0, columnspan=3, sticky="ew")
 
-        back_button = ttk.Button(controls_container, text="Voltar", command=lambda: self.previous_page())
-        back_button.grid(row=1, column=0, sticky="w", padx=5, pady=5)
-        ttk.Button(controls_container, text="Cancelar").grid(row=1, column=1, sticky="e", padx=5, pady=5)
-        ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page()).grid(row=1, column=2, sticky="e", padx=5, pady=5)
+        self.back_button = (ttk.Button(controls_container, text="Voltar", command=lambda: self.previous_page())
+                            .grid(row=1, column=0, sticky="w", padx=5, pady=5))
+
+        self.next_button = (ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page())
+                            .grid(row=1, column=2, sticky="e", padx=5, pady=5))
+
+        self.cancel_button = (ttk.Button(controls_container, text="Cancelar", command=lambda: self._on_cancel())
+                              .grid(row=1, column=1, sticky="e", padx=5, pady=5))
 
         self.page_sequence = page_sequence
         self.current_index: int = 0
@@ -62,6 +66,19 @@ class AppController(tk.Tk):
         else:
             self.logger.warning(f"Index out of bounds: {index}")
 
+    def next_page(self):
+        if self.current_index < len(self.page_sequence) - 1:
+            self.show_page_by_index(self.current_index + 1)
+
+    def previous_page(self):
+        if self.current_index > 0:
+            self.show_page_by_index(self.current_index - 1)
+
+    def _on_cancel(self):
+        if tk.messagebox.askyesno("Sair", "Tem certeza que deseja sair?"):
+            self.logger.info("Terminated by the user")
+            self.quit()
+
     def _show_page_instance(self, page_class: Type[BasePage]):
         if self.current_page is not None:
             self.logger.debug(f"Destroying current page: {type(self.current_page).__name__}")
@@ -71,14 +88,6 @@ class AppController(tk.Tk):
         self.logger.debug(f"Instantiated page: {type(page).__name__}")
         page.grid(row=0, column=0, sticky="nsew")
         self.current_page = page
-
-    def next_page(self):
-        if self.current_index < len(self.page_sequence) - 1:
-            self.show_page_by_index(self.current_index + 1)
-
-    def previous_page(self):
-        if self.current_index > 0:
-            self.show_page_by_index(self.current_index - 1)
 
     def _center_window(self):
         screen_width, screen_height = None, None
