@@ -35,10 +35,8 @@ class AppController(tk.Tk):
 
         # TODO: Finish the controllers system
         controls_container = ttk.Frame(self)
-        controls_container.grid(row=1, column=0, sticky="sew")
+        controls_container.grid(row=1, column=0, sticky="ew")
         controls_container.grid_columnconfigure(0, weight=1)
-        controls_container.grid_columnconfigure(1, weight=0)
-        controls_container.grid_columnconfigure(2, weight=0)
 
         ttk.Separator(controls_container, orient="horizontal").grid(row=0, column=0, columnspan=3, sticky="ew")
 
