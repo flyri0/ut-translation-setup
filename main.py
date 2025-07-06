@@ -2,7 +2,7 @@ import pathlib
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox
-from typing import Literal, Type, Optional, Dict
+from typing import Type, Optional
 
 from screeninfo import get_monitors
 
@@ -11,47 +11,72 @@ from pages.base import BasePage
 from pages.welcome import WelcomePage
 from pages.select_path import SelectPathPage
 
-# Keep this in sync with PageClassMap
-AvailablePages = Literal["WelcomePage", "SelectPathPage"]
-PagesClassMap: Dict[str, Type[BasePage]] = {
-    "WelcomePage": WelcomePage,
-    "SelectPathPage": SelectPathPage,
-}
+# Single source of truth: ordered page classes
+page_sequence: list[Type[BasePage]] = [
+    WelcomePage,
+    SelectPathPage,
+]
+
 
 class AppController(tk.Tk):
     def __init__(self):
         super().__init__()
         self.logger = AppLogger.get_logger()
         self.logger.info("App initialized")
+
         self._center_window()
         self._set_icon()
         self.title("Until Then - Instalar Tradução")
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        self.container = ttk.Frame(self)
+        self.container = tk.Frame(self)
         self.container.grid(row=0, column=0, sticky="nsew")
 
-        self.current_page: Optional[ttk.Frame] = None
-        self.show_page("WelcomePage")
+        controls_container = ttk.Frame(self)
+        controls_container.grid(row=1, column=0, sticky="sew")
+        controls_container.grid_columnconfigure(0, weight=1)
+        controls_container.grid_columnconfigure(1, weight=0)
+        controls_container.grid_columnconfigure(2, weight=0)
 
-    def show_page(self, name: AvailablePages):
-        if name not in PagesClassMap:
-            self.logger.error(f"Tried to navigate to unknown page: {name}")
-            raise ValueError(f"Invalid page name: {name}")
+        ttk.Separator(controls_container, orient="horizontal").grid(row=0, column=0, columnspan=3, sticky="ew")
 
-        self.logger.info(f"Navigating to page: {name}")
+        back_button = ttk.Button(controls_container, text="Voltar", command=lambda: self.previous_page())
+        back_button.grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ttk.Button(controls_container, text="Cancelar").grid(row=1, column=1, sticky="e", padx=5, pady=5)
+        ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page()).grid(row=1, column=2, sticky="e", padx=5, pady=5)
 
+        self.page_sequence = page_sequence
+        self.current_index: int = 0
+        self.current_page: Optional[tk.Frame] = None
+
+        self.show_page_by_index(self.current_index)
+
+    def show_page_by_index(self, index: int):
+        if 0 <= index < len(self.page_sequence):
+            self.current_index = index
+            page_class = self.page_sequence[index]
+            self._show_page_instance(page_class)
+        else:
+            self.logger.warning(f"Index out of bounds: {index}")
+
+    def _show_page_instance(self, page_class: Type[BasePage]):
         if self.current_page is not None:
             self.logger.debug(f"Destroying current page: {type(self.current_page).__name__}")
             self.current_page.destroy()
 
-        page_class: Type[ttk.Frame] = PagesClassMap[name]
         page = page_class(parent=self.container, controller=self)
         self.logger.debug(f"Instantiated page: {type(page).__name__}")
         page.grid(row=0, column=0, sticky="nsew")
-
         self.current_page = page
+
+    def next_page(self):
+        if self.current_index < len(self.page_sequence) - 1:
+            self.show_page_by_index(self.current_index + 1)
+
+    def previous_page(self):
+        if self.current_index > 0:
+            self.show_page_by_index(self.current_index - 1)
 
     def _center_window(self):
         screen_width, screen_height = None, None
@@ -85,8 +110,10 @@ if __name__ == "__main__":
     except Exception as e:
         logger = AppLogger.get_logger()
         logger.exception("Unhandled exception occurred during runtime")
-
-        tk.messagebox.showerror("Ocorreu um erro inesperado", f"Um arquivo de log foi gerado em: {AppLogger.get_log_file_path()}")
+        tk.messagebox.showerror(
+            "Ocorreu um erro inesperado",
+            f"Um arquivo de log foi gerado em: {AppLogger.get_log_file_path()}"
+        )
     finally:
         logger = AppLogger.get_logger()
         logger.info("Application closed")
