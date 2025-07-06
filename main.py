@@ -100,7 +100,7 @@ class AppController(tk.Tk):
     def _set_icon(self):
         icon_path = pathlib.Path(__file__).parent / "assets" / "icon.ico"
         try:
-            self.iconbitmap(icon_path)
+            self.iconbitmap(str(icon_path))
             self.logger.debug(f"Application icon set from {icon_path}")
         except Exception as icon_error:
             self.logger.warning(f"Failed to set application icon: {icon_error}")
