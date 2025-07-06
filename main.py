@@ -110,7 +110,7 @@ if __name__ == "__main__":
     try:
         app = AppController()
         app.mainloop()
-    except Exception as e:
+    except Exception:
         logger.exception("Unhandled exception occurred during runtime")
         tk.messagebox.showerror(
             "Ocorreu um erro inesperado",
