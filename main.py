@@ -33,6 +33,7 @@ class AppController(tk.Tk):
         self.container = tk.Frame(self)
         self.container.grid(row=0, column=0, sticky="nsew")
 
+        # TODO: Finish the controllers system
         controls_container = ttk.Frame(self)
         controls_container.grid(row=1, column=0, sticky="sew")
         controls_container.grid_columnconfigure(0, weight=1)
@@ -57,6 +58,7 @@ class AppController(tk.Tk):
             self.current_index = index
             page_class = self.page_sequence[index]
             self._show_page_instance(page_class)
+            self.logger.info(f"Page \"{page_class.__name__}\" displayed")
         else:
             self.logger.warning(f"Index out of bounds: {index}")
 
