@@ -103,6 +103,7 @@ class AppController(tk.Tk):
         position_y = (screen_height - window_height) // 2
 
         self.logger.debug(f"Window size set to {window_width}x{window_height} at ({position_x}, {position_y})")
+        self.resizable(False, False)
         self.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
 
     def _set_icon(self):
