@@ -21,6 +21,7 @@ page_sequence: list[Type[BasePage]] = [
 class AppController(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.protocol("WM_DELETE_WINDOW", self._handle_exit)
         self.logger = AppLogger.get_logger()
         self.logger.info("Application initialized")
 
@@ -47,7 +48,7 @@ class AppController(tk.Tk):
         self.next_button = (ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page())
                             .grid(row=1, column=2, sticky="e", padx=5, pady=5))
 
-        self.cancel_button = (ttk.Button(controls_container, text="Cancelar", command=lambda: self._on_cancel())
+        self.cancel_button = (ttk.Button(controls_container, text="Cancelar", command=lambda: self._handle_exit())
                               .grid(row=1, column=1, sticky="e", padx=5, pady=5))
 
         self.page_sequence = page_sequence
@@ -73,10 +74,10 @@ class AppController(tk.Tk):
         if self.current_index > 0:
             self.show_page_by_index(self.current_index - 1)
 
-    def _on_cancel(self):
+    def _handle_exit(self):
         if tk.messagebox.askyesno("Sair", "Tem certeza que deseja sair?"):
             self.logger.info("Terminated by the user")
-            self.quit()
+            self.destroy()
 
     def _show_page_instance(self, page_class: Type[BasePage]):
         if self.current_page is not None:
