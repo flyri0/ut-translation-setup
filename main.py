@@ -98,7 +98,7 @@ class AppController(tk.Tk):
                 self.logger.debug(f"Primary monitor detected: {screen_width}x{screen_height}")
                 break
 
-        window_width = int(screen_width * 0.5)
+        window_width = int(screen_width * 0.4)
         window_height = int(screen_height * 0.5)
         position_x = (screen_width - window_width) // 2
         position_y = (screen_height - window_height) // 2
