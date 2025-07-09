@@ -55,9 +55,9 @@ class AppController(tk.Tk):
         self.current_index: int = 0
         self.current_page: Optional[tk.Frame] = None
 
-        self.show_page_by_index(self.current_index)
+        self._show_page_by_index(self.current_index)
 
-    def show_page_by_index(self, index: int):
+    def _show_page_by_index(self, index: int):
         if 0 <= index < len(self.page_sequence):
             self.current_index = index
             page_class = self.page_sequence[index]
@@ -68,11 +68,11 @@ class AppController(tk.Tk):
 
     def next_page(self):
         if self.current_index < len(self.page_sequence) - 1:
-            self.show_page_by_index(self.current_index + 1)
+            self._show_page_by_index(self.current_index + 1)
 
     def previous_page(self):
         if self.current_index > 0:
-            self.show_page_by_index(self.current_index - 1)
+            self._show_page_by_index(self.current_index - 1)
 
     def _handle_exit(self):
         if tk.messagebox.askyesno("Sair", "Tem certeza que deseja sair?"):
