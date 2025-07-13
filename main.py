@@ -42,14 +42,14 @@ class AppController(tk.Tk):
 
         ttk.Separator(controls_container, orient="horizontal").grid(row=0, column=0, columnspan=3, sticky="ew")
 
-        self.back_button = (ttk.Button(controls_container, text="Voltar", command=lambda: self.previous_page())
-                            .grid(row=1, column=0, sticky="w", padx=5, pady=5))
+        self.back_button = ttk.Button(controls_container, text="Voltar", command=lambda: self.previous_page())
+        self.back_button.grid(row=1, column=0, sticky="w", padx=5, pady=5)
 
-        self.next_button = (ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page())
-                            .grid(row=1, column=2, sticky="e", padx=5, pady=5))
+        self.next_button = ttk.Button(controls_container, text="Próximo", command=lambda: self.next_page())
+        self.next_button.grid(row=1, column=2, sticky="e", padx=5, pady=5)
 
-        self.cancel_button = (ttk.Button(controls_container, text="Cancelar", command=lambda: self._handle_exit())
-                              .grid(row=1, column=1, sticky="e", padx=5, pady=5))
+        self.cancel_button = ttk.Button(controls_container, text="Cancelar", command=lambda: self._handle_exit())
+        self.cancel_button.grid(row=1, column=1, sticky="e", padx=5, pady=5)
 
         self.page_sequence = page_sequence
         self.current_index: int = 0
