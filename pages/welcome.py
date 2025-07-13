@@ -2,6 +2,8 @@ import pathlib
 from PIL import ImageTk, Image
 from tkinter import ttk
 
+from tkhtmlview import RenderHTML, HTMLLabel
+
 from pages.base import BasePage
 
 # TODO: Literally everything, this is just a test :_)
@@ -10,13 +12,23 @@ class WelcomePage(BasePage):
         super().__init__(parent, controller)
         controller.logger.debug("WelcomePage: loaded")
         self._display_banner()
+        self._display_message()
 
-        self.grid_rowconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
 
-        label = ttk.Label(self, text="Bem-vindo ao UT-Translation")
-        label.grid(row=0, column=1)
+    def _display_message(self):
+        html_file = pathlib.Path(__file__).parent.parent / "assets" / "welcome_message.html"
+
+        if html_file.exists():
+            self.controller.logger.debug(f"WelcomePage: Welcome message successfully loaded from {html_file}")
+            self.welcome_message = HTMLLabel(self, html=RenderHTML(html_file), cursor="arrow")
+            self.welcome_message.grid(row=0, column=1, sticky="s", padx=10)
+        else:
+            self.controller.logger.warning(f"WelcomePage: Failed to load welcome message from {html_file}")
+            self.welcome_message = ttk.Label(self, text="Until Then... em português!")
+            self.welcome_message.grid(row=0, column=1, sticky="nsew")
 
     def _display_banner(self):
         banner_path = pathlib.Path(__file__).parent.parent / "assets" / "banner.jpg"
