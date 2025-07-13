@@ -9,12 +9,12 @@ from screeninfo import get_monitors
 from logger import AppLogger
 from pages.base import BasePage
 from pages.welcome import WelcomePage
-from pages.select_path import SelectPathPage
+from pages.select_game_path import SelectGamePathPage
 
 # Single source of truth: ordered page classes
 page_sequence: list[Type[BasePage]] = [
     WelcomePage,
-    SelectPathPage,
+    SelectGamePathPage,
 ]
 
 

@@ -2,7 +2,7 @@ import tkinter.ttk as ttk
 
 from pages.base import BasePage
 
-class SelectPathPage(BasePage):
+class SelectGamePathPage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
 
