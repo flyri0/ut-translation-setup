@@ -1,4 +1,6 @@
 import tkinter.ttk as ttk
+import tkinter as tk
+from tkinter import font
 
 from pages.base import BasePage
 
@@ -9,19 +11,15 @@ class SelectGamePathPage(BasePage):
         controller.logger.debug("SelectGamePathPage: loaded")
         controller.back_button.configure(state="enabled")
 
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        selected_path_frame = ttk.Frame(self)
+        selected_path_frame.pack(fill="x", expand=True)
+        selected_path_frame.columnconfigure(0, weight=1)
 
-        content = ttk.Frame(self)
-        content.grid(row=0, column=0)
-        content.columnconfigure(0, weight=1)
+        self.path_label = ttk.Label(selected_path_frame, borderwidth=1, relief="solid")
+        self.path_label.grid(row=0, column=0, sticky="ew", padx=(0, 5))
 
-        ttk.Label(content, text="Caminho do jogo").grid(row=0, column=0, sticky="w", padx=5)
+        self.select_path_button = ttk.Button(selected_path_frame, text="Selecionar")
+        self.select_path_button.grid(row=0, column=1)
 
-        ttk.Entry(content, state="readonly", width=40).grid(row=1, column=0, sticky="ew", padx=5, pady=2)
-
-        ttk.Button(content, text="Selecionar").grid(row=1, column=1, sticky="w", padx=5, pady=2)
-
-        ttk.Label(content, text="UntilThen.exe encontrado", foreground="green").grid(
-            row=2, column=0, columnspan=2, sticky="w", padx=5
-        )
+        self.status_label = ttk.Label(selected_path_frame, text="UntilThen.exe não foi encontrado.", foreground="red")
+        self.status_label.grid(row=1, column=0, columnspan=2, sticky="w", pady=(5, 0))
