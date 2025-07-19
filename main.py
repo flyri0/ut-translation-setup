@@ -2,6 +2,7 @@ import gettext
 import pathlib
 import tkinter.messagebox
 
+import darkdetect
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from typing import Type, Optional
@@ -22,8 +23,8 @@ page_sequence: list[Type[BasePage]] = [
 _ = gettext.gettext
 
 class App(ttk.Window):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, theme_name: str = "cosmo"):
+        super().__init__(themename=theme_name)
 
         self.protocol("WM_DELETE_WINDOW", self._handle_exit)
 
@@ -115,8 +116,14 @@ class App(ttk.Window):
 
 if __name__ == "__main__":
     logger = AppLogger.get_logger()
+    theme = "cosmo"
+
     try:
-        app = App()
+        if darkdetect.isDark():
+            logger.info("App: Dark mode detected")
+            theme = "darkly"
+
+        app = App(theme_name=theme)
         app.mainloop()
     except Exception:
         logger.exception("Unhandled exception occurred during runtime")
