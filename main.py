@@ -48,13 +48,28 @@ class App(ttk.Window):
 
         ttk.Separator(controls_container, orient="horizontal", style=SECONDARY).grid(row=0, column=0, columnspan=3, sticky="ew")
 
-        self.cancel_button = ttk.Button(controls_container, text=_("Cancel"), style=f'{OUTLINE},{DANGER}', command=lambda: self._handle_exit())
+        self.cancel_button = ttk.Button(
+            controls_container,
+            text=_("Cancel"),
+            style=f'{OUTLINE},{DANGER}',
+            cursor="hand2",
+            command=lambda: self._handle_exit())
         self.cancel_button.grid(row=1, column=0, sticky="w", pady=10, padx=(10, 0))
 
-        self.back_button = ttk.Button(controls_container, text=_("Back"), style=OUTLINE, command=lambda: self._show_page(self.current_index - 1))
+        self.back_button = ttk.Button(
+            controls_container,
+            text=_("Back"),
+            style=OUTLINE,
+            cursor="hand2",
+            command=lambda: self._show_page(self.current_index - 1))
         self.back_button.grid(row=1, column=1, sticky="w", pady=10, padx=(0, 10))
 
-        self.next_button = ttk.Button(controls_container, text=_("Next"), style=OUTLINE, command=lambda: self._show_page(self.current_index + 1))
+        self.next_button = ttk.Button(
+            controls_container,
+            text=_("Next"),
+            style=OUTLINE,
+            cursor="hand2",
+            command=lambda: self._show_page(self.current_index + 1))
         self.next_button.grid(row=1, column=2, sticky="e", pady=10, padx=(0, 10))
 
         self.page_sequence = page_sequence
