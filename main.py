@@ -29,6 +29,7 @@ class App(ttk.Window):
     def __init__(self, theme_name: str = "cosmo"):
         super().__init__(themename=theme_name)
 
+        self.report_callback_exception = self._handle_exception
         self.protocol("WM_DELETE_WINDOW", self._handle_exit)
 
         self.state = AppState()
@@ -133,6 +134,16 @@ class App(ttk.Window):
         else:
             self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
 
+    def _handle_exception(self, exc_type, exc_value, exc_traceback):
+        self.logger.error("Unhandled exception in Tkinter callback", exc_info=(exc_type, exc_value, exc_traceback))
+
+        tkinter.messagebox.showerror(
+            _("An unexpected error has occurred"),
+            f"A log file was generated at: {AppLogger.get_log_file_path()}"
+        )
+
+        self.destroy()
+
 if __name__ == "__main__":
     logger = AppLogger.get_logger()
     theme = "cosmo"
@@ -145,6 +156,7 @@ if __name__ == "__main__":
         app = App(theme_name=theme)
         app.mainloop()
     except Exception:
+        # Only handles setup/startup errors now
         logger.exception("Unhandled exception occurred during runtime")
         tkinter.messagebox.showerror(
             _("An unexpected error has occurred"),
