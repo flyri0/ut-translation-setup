@@ -12,6 +12,7 @@ class WelcomePage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         controller.logger.debug("WelcomePage: loaded")
+        controller.title(_("Translation Installer: Welcome"))
         controller.back_button.configure(state="disabled", cursor="arrow")
         self._display_banner()
         self._display_message()
