@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import logging
 import pathlib
@@ -13,7 +14,12 @@ class AppLogger:
             cls._logger = logging.getLogger("AppLogger")
             cls._logger.setLevel(logging.DEBUG)
 
-            log_dir = pathlib.Path(__file__).parent / "logs"
+            if getattr(sys, 'frozen', False):
+                base_path = pathlib.Path(sys.executable).parent
+            else:
+                base_path = pathlib.Path(__file__).parent
+
+            log_dir = base_path / "logs"
             log_dir.mkdir(exist_ok=True)
 
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
