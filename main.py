@@ -23,6 +23,8 @@ page_sequence: list[Type[BasePage]] = [
 # TODO: Implement i18n support
 _ = gettext.gettext
 
+LOG_PREFIX = "App:"
+
 class App(ttk.Window):
     def __init__(self, theme_name: str = "cosmo"):
         super().__init__(themename=theme_name)
@@ -31,7 +33,7 @@ class App(ttk.Window):
 
         self.state = AppState()
         self.logger = AppLogger.get_logger()
-        self.logger.info("App: Initialized")
+        self.logger.info(f"{LOG_PREFIX} Initialized")
 
         self._center_window()
         self._set_icon()
@@ -81,11 +83,11 @@ class App(ttk.Window):
 
     def _show_page(self, index: int):
         if not (0 <= index < len(self.page_sequence)):
-            self.logger.warning(f"App: Page index {index} out of bounds")
+            self.logger.warning(f"{LOG_PREFIX} Page index {index} out of bounds")
             return
 
         if self.current_page is not None:
-            self.logger.debug(f"App: Destroying page {type(self.current_page).__name__}")
+            self.logger.debug(f"{LOG_PREFIX} Destroying page {type(self.current_page).__name__}")
             self.current_page.destroy()
 
         page_class = self.page_sequence[index]
@@ -94,7 +96,7 @@ class App(ttk.Window):
         self.current_page = page
         self.current_index = index
 
-        self.logger.info(f"App: Page {type(page).__name__} displayed")
+        self.logger.info(f"{LOG_PREFIX} Page {type(page).__name__} displayed")
 
     def _set_icon(self):
         icon_path = pathlib.Path(__file__).parent / "assets" / "icon.ico"
@@ -102,9 +104,9 @@ class App(ttk.Window):
         try:
             self.iconbitmap(default=str(icon_path))
             self.iconbitmap(str(icon_path))
-            self.logger.debug(f"App: Icon set from {icon_path}")
+            self.logger.debug(f"{LOG_PREFIX} Icon set from {icon_path}")
         except Exception as error:
-            self.logger.warning(f"App: Failed to set icon from {icon_path}: {error}")
+            self.logger.warning(f"{LOG_PREFIX} Failed to set icon from {icon_path}: {error}")
 
     def _center_window(self):
         screen_width, screen_height = None, None
@@ -112,7 +114,7 @@ class App(ttk.Window):
             if monitor.is_primary:
                 screen_width = monitor.width
                 screen_height = monitor.height
-                self.logger.debug(f"App: Primary monitor detected: {monitor.name} with dimensions {monitor.width}x{monitor.height}")
+                self.logger.debug(f"{LOG_PREFIX} Primary monitor detected: {monitor.name} with dimensions {monitor.width}x{monitor.height}")
                 break
 
         window_width = int(screen_width * 0.4)
@@ -120,16 +122,16 @@ class App(ttk.Window):
         position_x = int(screen_width - window_width) // 2
         position_y = int(screen_height - window_height) // 2
 
-        self.logger.debug(f"App: Window size set to {window_width}x{window_height} at ({position_x}, {position_y})")
+        self.logger.debug(f"{LOG_PREFIX} Window size set to {window_width}x{window_height} at ({position_x}, {position_y})")
         self.resizable(False, False)
         self.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
 
     def _handle_exit(self):
-        self.logger.info("App: Termination requested by user")
+        self.logger.info(f"{LOG_PREFIX} Termination requested by user")
         if tkinter.messagebox.askyesno(_("Exit"), _("Are you sure you want to exit?")):
             self.destroy()
         else:
-            self.logger.info("App: Termination aborted by user")
+            self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
 
 if __name__ == "__main__":
     logger = AppLogger.get_logger()
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 
     try:
         if darkdetect.isDark():
-            logger.info("App: Dark mode detected")
+            logger.info(f"{LOG_PREFIX} Dark mode detected")
             theme = "darkly"
 
         app = App(theme_name=theme)
@@ -149,4 +151,4 @@ if __name__ == "__main__":
             f"A log file was generated at: {AppLogger.get_log_file_path()}"
         )
     finally:
-        logger.info("App: Terminated")
+        logger.info(f"{LOG_PREFIX} Terminated")

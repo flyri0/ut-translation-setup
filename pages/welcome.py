@@ -8,10 +8,12 @@ from pages.base import BasePage
 # TODO: Implement i18n support
 _ = gettext.gettext
 
+LOG_PREFIX = "WelcomePage:"
+
 class WelcomePage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
-        controller.logger.debug("WelcomePage: loaded")
+        controller.logger.debug(f"{LOG_PREFIX} loaded")
         controller.title(_("Translation Installer: Welcome"))
         controller.back_button.configure(state="disabled", cursor="arrow")
         controller.next_button.configure(state="enabled", cursor="hand2")
@@ -65,9 +67,9 @@ class WelcomePage(BasePage):
 
         try:
             banner_source = Image.open(banner_path)
-            self.controller.logger.debug(f"WelcomePage: Banner image loaded from {banner_path}")
+            self.controller.logger.debug(f"{LOG_PREFIX} Banner image loaded from {banner_path}")
         except Exception as banner_path_error:
-            self.controller.logger.warning(f"WelcomePage: Failed to load banner image from {banner_path}: {banner_path_error}")
+            self.controller.logger.warning(f"{LOG_PREFIX} Failed to load banner image from {banner_path}: {banner_path_error}")
             banner_source = None
 
         if banner_source is not None:
