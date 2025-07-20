@@ -106,10 +106,6 @@ class SelectGamePathPage(BasePage):
                     pathlib.Path.home() / ".local" / "share" / "Steam",
                     pathlib.Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / "data" / "Steam"
                 ]
-            case "Darwin":
-                possible_paths = [
-                    pathlib.Path.home() / "Library" / "Application Support" / "Steam"
-                ]
             case _:
                 self.controller.logger.warning(f"{LOG_PREFIX} Unsupported system: {system}")
                 return None
