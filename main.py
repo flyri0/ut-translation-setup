@@ -13,6 +13,7 @@ from logger import AppLogger
 from pages.base import BasePage
 from pages.select_game_path import SelectGamePathPage
 from pages.welcome import WelcomePage
+from state import AppState
 
 page_sequence: list[Type[BasePage]] = [
     WelcomePage,
@@ -28,6 +29,7 @@ class App(ttk.Window):
 
         self.protocol("WM_DELETE_WINDOW", self._handle_exit)
 
+        self.state = AppState()
         self.logger = AppLogger.get_logger()
         self.logger.info("App: Initialized")
 
