@@ -2,6 +2,8 @@ import gettext
 import os
 import pathlib
 import platform
+import tkinter.filedialog
+import tkinter.messagebox
 
 import vdf
 from ttkbootstrap import ttk
@@ -15,7 +17,6 @@ FULL_GAME_ID = 1574820
 DEMO_GAME_ID = 2296400
 LOG_PREFIX = "SelectGamePathPage:"
 
-# TODO: Implement auto install path find logic
 class SelectGamePathPage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
@@ -28,17 +29,31 @@ class SelectGamePathPage(BasePage):
         container.pack(fill="x", expand=True, padx=100)
         container.columnconfigure(0, weight=1)
 
-        path_frame = ttk.LabelFrame(container, text=_("Selected Directory"))
+        path_frame = ttk.LabelFrame(container, text=_("Game Executable Path"))
         path_frame.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 5))
 
         self.path_label = ttk.Label(path_frame)
         self.path_label.pack(fill="x", expand=True, ipady=2, padx=5, pady=5)
 
-        self.select_path_button = ttk.Button(container, text=_("Select"))
+        self.select_path_button = ttk.Button(container, text=_("Select"), command=lambda: self._handle_select())
         self.select_path_button.grid(row=1, column=1, padx=(10, 0), sticky="e")
 
         self.status_label = ttk.Label(container)
         self.status_label.grid(row=1, column=0, sticky="w", pady=(5, 0))
+
+        self._detect_until_then_game_path()
+        self.after_idle(self._validate_path) # type: ignore
+
+    # TODO: finish validation logic
+    def _validate_path(self):
+        if self.controller.state.game_path is None:
+            self.controller.logger.warning(f"{LOG_PREFIX} Asking the user to indicate the path")
+            tkinter.messagebox.showwarning(
+                _("Game path not found"),
+                _("We can't find the game executable, please select manually"))
+            self._handle_select()
+            return
+        print(self.controller.state.game_path)
 
     def _detect_until_then_game_path(self):
         full_path = self._autodetect_game_path(FULL_GAME_ID)
@@ -55,6 +70,10 @@ class SelectGamePathPage(BasePage):
         else:
             self.controller.logger.info(f"{LOG_PREFIX} Demo version not found")
             self.controller.state.game_path = None
+
+    # TODO: finish manual selection logic
+    def _handle_select(self):
+        self.controller.state.game_path = tkinter.filedialog.askopenfilename(filetypes=[(_("Game executable file"), "*.exe")])
 
     def _autodetect_game_path(self, game_id: int):
         self.controller.logger.debug(f"{LOG_PREFIX} Trying to auto-detect game path")
