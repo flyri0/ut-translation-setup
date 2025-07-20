@@ -1,12 +1,13 @@
+import gettext
 import pathlib
 from PIL import ImageTk, Image
-from tkinter import ttk
-
-from tkhtmlview import RenderHTML, HTMLLabel
+import ttkbootstrap as ttk
 
 from pages.base import BasePage
 
-# TODO: Literally everything, this is just a test :_)
+# TODO: Implement i18n support
+_ = gettext.gettext
+
 class WelcomePage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
@@ -20,16 +21,40 @@ class WelcomePage(BasePage):
         self.grid_columnconfigure(1, weight=1)
 
     def _display_message(self):
-        html_file = pathlib.Path(__file__).parent.parent / "assets" / "welcome_message.html"
+        def update_wraplength(event):
+            message_label.config(wraplength=container.winfo_width() - 30)
 
-        if html_file.exists():
-            self.controller.logger.debug(f"WelcomePage: Welcome message successfully loaded from {html_file}")
-            self.welcome_message = HTMLLabel(self, html=RenderHTML(html_file), cursor="arrow")
-            self.welcome_message.grid(row=0, column=1, sticky="s", padx=10)
-        else:
-            self.controller.logger.warning(f"WelcomePage: Failed to load welcome message from {html_file}")
-            self.welcome_message = ttk.Label(self, text="Until Then... em português!")
-            self.welcome_message.grid(row=0, column=1, sticky="nsew")
+        bold_font = ("TkDefaultFont", 12, "bold")
+        italic_font = ("TkDefaultFont", 9, "italic")
+
+        container = ttk.Frame(self)
+        container.grid(row=0, column=1, sticky="nsew")
+
+        for i in (0, 6):
+            container.rowconfigure(i, weight=1)
+        for i in range(1, 6):
+            container.rowconfigure(i, weight=0)
+        container.columnconfigure(0, weight=1)
+
+        ttk.Label(container, text=_("Until Then... in portuguese!"), font=bold_font) \
+            .grid(row=1, column=0, pady=(0, 10), sticky="n")
+
+        message_label = ttk.Label(
+            container,
+            text=_(
+                "Thank you for being here. This translation was made with love by fans, "
+                "so that more people can experience the story of Until Then in our language. "
+                "We hope you get as emotional as we did."
+            )
+        )
+        message_label.grid(row=2, column=0, sticky="n")
+        message_label.bind("<Configure>", update_wraplength)
+
+        ttk.Label(container, text=_("Translation by: someone"), font=italic_font) \
+            .grid(row=4, column=0, pady=(30, 0), sticky="s")
+
+        ttk.Label(container, text=_("Installer by: someone"), font=italic_font) \
+            .grid(row=5, column=0, sticky="s")
 
     def _display_banner(self):
         banner_path = pathlib.Path(__file__).parent.parent / "assets" / "banner.jpg"
@@ -53,5 +78,5 @@ class WelcomePage(BasePage):
             )
             self.banner = ImageTk.PhotoImage(self.resized_banner_source)
 
-            self.banner_label = ttk.Label(self, image=self.banner) # type: ignore
+            self.banner_label = ttk.Label(self, image=self.banner, borderwidth=0) # type: ignore
             self.banner_label.grid(row=0, column=0, sticky="nsew")
