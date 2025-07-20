@@ -5,3 +5,4 @@ from typing import Optional
 @dataclass
 class AppState:
     game_path: Optional[str] = None
+    is_demo: bool = None

@@ -74,6 +74,7 @@ class SelectGamePathPage(BasePage):
             if path:
                 self.controller.logger.info(f"{LOG_PREFIX} Game found for ID {game_id}")
                 self.controller.state.game_path = path
+                self.controller.state.is_demo = (game_id == DEMO_GAME_ID)
                 return
 
         self.controller.logger.info(f"{LOG_PREFIX} No game installation found")
