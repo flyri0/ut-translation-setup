@@ -51,7 +51,6 @@ class SelectGamePathPage(BasePage):
 
     def _validate_path(self):
         game_path = self.controller.state.game_path
-        self.path_label.configure(text=str(game_path) if game_path else "")
 
         exe_path = game_path / GAME_EXE_NAME if game_path else None
 
@@ -65,6 +64,7 @@ class SelectGamePathPage(BasePage):
             )
         else:
             self.controller.logger.info(f"{LOG_PREFIX} Valid game executable found at {exe_path}")
+            self.path_label.configure(text=str(exe_path))
             self.status_label.configure(text=_("UntilThen.exe found."), style="success.TLabel")
             self.controller.next_button.configure(state="enabled", cursor="hand2")
 
@@ -85,6 +85,7 @@ class SelectGamePathPage(BasePage):
             filetypes=[(_("Game executable file"), "*.exe")]
         )
         if selected_path:
+            self.path_label.configure(text=str(selected_path))
             self.controller.state.game_path = pathlib.Path(selected_path).parent
         self._validate_path()
 
