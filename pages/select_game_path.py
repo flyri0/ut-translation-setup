@@ -6,7 +6,7 @@ import tkinter.filedialog
 import tkinter.messagebox
 
 import vdf
-from ttkbootstrap import ttk
+from ttkbootstrap import ttk, DANGER
 
 from pages.base import BasePage
 
@@ -43,7 +43,7 @@ class SelectGamePathPage(BasePage):
         )
         self.select_path_button.grid(row=1, column=1, padx=(10, 0), sticky="e")
 
-        self.status_label = ttk.Label(container)
+        self.status_label = ttk.Label(container, font=("TkDefaultFont", 8, "bold"))
         self.status_label.grid(row=1, column=0, sticky="w", pady=(5, 0))
 
         self._detect_until_then_game_path()
@@ -57,7 +57,7 @@ class SelectGamePathPage(BasePage):
 
         if not exe_path or not exe_path.is_file():
             self.controller.logger.warning(f"{LOG_PREFIX} Valid game executable not found at {exe_path}")
-            self.status_label.configure(text=_("UntilThen.exe not found."), bootstyle="danger")
+            self.status_label.configure(text=_("UntilThen.exe not found."), style="danger.TLabel")
             self.controller.next_button.configure(state="disabled", cursor="arrow")
             tkinter.messagebox.showwarning(
                 _("Game executable not found"),
@@ -65,7 +65,7 @@ class SelectGamePathPage(BasePage):
             )
         else:
             self.controller.logger.info(f"{LOG_PREFIX} Valid game executable found at {exe_path}")
-            self.status_label.configure(text=_("UntilThen.exe found."), bootstyle="success")
+            self.status_label.configure(text=_("UntilThen.exe found."), style="success.TLabel")
             self.controller.next_button.configure(state="enabled", cursor="hand2")
 
     def _detect_until_then_game_path(self):

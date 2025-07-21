@@ -146,7 +146,7 @@ class App(ttk.Window):
 
 if __name__ == "__main__":
     logger = AppLogger.get_logger()
-    theme = "cosmo"
+    theme = "litera"
 
     try:
         if darkdetect.isDark():
