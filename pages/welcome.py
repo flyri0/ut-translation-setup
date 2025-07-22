@@ -15,8 +15,6 @@ class WelcomePage(BasePage):
         super().__init__(parent, controller)
         controller.logger.debug(f"{LOG_PREFIX} loaded")
         controller.title(_("Translation Installer: Welcome"))
-        controller.back_button.configure(state="disabled", cursor="arrow")
-        controller.next_button.configure(state="enabled", cursor="hand2")
 
         self._display_banner()
         self._display_message()

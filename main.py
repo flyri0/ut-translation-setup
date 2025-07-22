@@ -6,7 +6,6 @@ import darkdetect
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from typing import Type, Optional
-
 from screeninfo import get_monitors
 
 from logger import _Logger
@@ -66,7 +65,7 @@ class App(ttk.Window):
             text=_("Back"),
             style=OUTLINE,
             cursor="hand2",
-            command=lambda: self._show_page(self.current_index - 1))
+            command=lambda: self._previous_page())
         self.back_button.grid(row=1, column=1, sticky="w", pady=10, padx=(0, 10))
 
         self.next_button = ttk.Button(
@@ -74,13 +73,32 @@ class App(ttk.Window):
             text=_("Next"),
             style=OUTLINE,
             cursor="hand2",
-            command=lambda: self._show_page(self.current_index + 1))
+            command=lambda: self._next_page())
         self.next_button.grid(row=1, column=2, sticky="e", pady=10, padx=(0, 10))
 
         self.page_sequence = page_sequence
         self.current_index: int = 0
         self.current_page: Optional[ttk.Frame] = None
         self._show_page(0)
+
+    def _update_navigation_buttons(self):
+        if self.current_index == 0:
+            self.back_button.configure(state="disabled", cursor="arrow")
+        else:
+            self.back_button.configure(state="normal", cursor="hand2")
+
+        if self.current_index == len(self.page_sequence) - 1:
+            self.next_button.configure(state="disabled", cursor="arrow")
+        else:
+            self.next_button.configure(state="normal", cursor="hand2")
+
+    def _next_page(self):
+        if self.current_index < len(self.page_sequence) - 1:
+            self._show_page(self.current_index + 1)
+
+    def _previous_page(self):
+        if self.current_index > 0:
+            self._show_page(self.current_index - 1)
 
     def _show_page(self, index: int):
         if not (0 <= index < len(self.page_sequence)):
@@ -98,6 +116,8 @@ class App(ttk.Window):
         self.current_index = index
 
         self.logger.info(f"{LOG_PREFIX} Page {type(page).__name__} displayed")
+
+        self._update_navigation_buttons()
 
     def _set_icon(self):
         icon_path = pathlib.Path(__file__).parent / "assets" / "icon.ico"
@@ -124,7 +144,6 @@ class App(ttk.Window):
         position_y = int(screen_height - window_height) // 2
 
         self.logger.debug(f"{LOG_PREFIX} Window size set to {window_width}x{window_height} at ({position_x}, {position_y})")
-        self.resizable(False, False)
         self.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
 
     def _handle_exit(self):
@@ -139,7 +158,7 @@ class App(ttk.Window):
 
         tkinter.messagebox.showerror(
             _("An unexpected error has occurred"),
-            f"A log file was generated at: {AppLogger.get_log_file_path()}"
+            f"A log file was generated at: {_Logger.get_log_file_path()}"
         )
 
         self.destroy()
@@ -160,7 +179,8 @@ if __name__ == "__main__":
         logger.exception("Unhandled exception occurred during runtime")
         tkinter.messagebox.showerror(
             _("An unexpected error has occurred"),
-            f"A log file was generated at: {AppLogger.get_log_file_path()}"
+            f"A log file was generated at: {_Logger.get_log_file_path()}"
         )
     finally:
-        logger.info(f"{LOG_PREFIX} Terminated")
+        if logger is not None:
+            logger.info(f"{LOG_PREFIX} Terminated")

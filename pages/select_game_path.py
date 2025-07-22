@@ -25,9 +25,6 @@ class SelectGamePathPage(BasePage):
         self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
         self.controller.title(_("Translation Installer: Find Game Install Directory"))
 
-        self.controller.back_button.configure(state="enabled", cursor="hand2")
-        self.controller.next_button.configure(state="disabled", cursor="arrow")
-
         container = ttk.Frame(self)
         container.pack(fill="x", expand=True, padx=100)
         container.columnconfigure(0, weight=1)
