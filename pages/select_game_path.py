@@ -2,6 +2,7 @@ import gettext
 import os
 import pathlib
 import platform
+import threading
 import tkinter.filedialog
 import tkinter.messagebox
 
@@ -43,6 +44,9 @@ class SelectGamePathPage(BasePage):
         self.status_label = ttk.Label(container, font=("TkDefaultFont", 8, "bold"))
         self.status_label.grid(row=1, column=0, sticky="w", pady=(5, 0))
 
+        threading.Thread(target=self._detect_and_validate, daemon=True).start()
+
+    def _detect_and_validate(self):
         self._detect_until_then_game_path()
         self.after_idle(self._validate_path) # type: ignore
 
