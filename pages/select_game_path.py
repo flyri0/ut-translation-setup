@@ -66,6 +66,9 @@ class SelectGamePathPage(BasePage):
             self.controller.next_button.configure(state="enabled", cursor="hand2")
 
     def _detect_until_then_game_path(self):
+        if self.controller.state.game_path is not None:
+            return
+
         for game_id in [FULL_GAME_ID, DEMO_GAME_ID]:
             path = self._autodetect_game_path(game_id)
             if path:
