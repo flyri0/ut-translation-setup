@@ -9,7 +9,7 @@ from typing import Type, Optional
 
 from screeninfo import get_monitors
 
-from logger import AppLogger
+from logger import _Logger
 from pages.base import BasePage
 from pages.select_game_path import SelectGamePathPage
 from pages.welcome import WelcomePage
@@ -33,7 +33,7 @@ class App(ttk.Window):
         self.protocol("WM_DELETE_WINDOW", self._handle_exit)
 
         self.state = AppState()
-        self.logger = AppLogger.get_logger()
+        self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Initialized")
 
         self._center_window()
@@ -145,7 +145,7 @@ class App(ttk.Window):
         self.destroy()
 
 if __name__ == "__main__":
-    logger = AppLogger.get_logger()
+    logger = _Logger.get_logger()
     theme = "litera"
 
     try:
