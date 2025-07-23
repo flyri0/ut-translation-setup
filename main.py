@@ -37,8 +37,8 @@ class App(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(0, 10, 0, 10)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack, stretch=1)
@@ -114,7 +114,7 @@ class App(QMainWindow):
         else:
             screen_w, screen_h = 1280, 720
 
-        width = int(screen_w * 0.4)
+        width = int(screen_w * 0.35)
         height = int(screen_h * 0.5)
         self.resize(width, height)
 
