@@ -1,5 +1,3 @@
-# pages/welcome.py
-
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 
 class SelectGamePath(QWidget):
