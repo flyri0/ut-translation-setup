@@ -109,19 +109,29 @@ class App(QMainWindow):
     def _center_window(self):
         for monitor in get_monitors():
             if monitor.is_primary:
-                screen_w, screen_h = monitor.width, monitor.height
+                screen_width, screen_height = monitor.width, monitor.height
                 break
         else:
-            screen_w, screen_h = 1280, 720
+            screen_width, screen_height = 1280, 720
 
-        width = int(screen_w * 0.35)
-        height = int(screen_h * 0.5)
-        self.resize(width, height)
+        target_aspect_width, target_aspect_height = 4, 3 # target aspect ratio (width : height)
+        max_width_ratio, max_height_ratio = 0.5, 0.5 # maximum fraction of the screen the window may occupy in %
 
-        geo = self.frameGeometry()
-        center = self.screen().availableGeometry().center()
-        geo.moveCenter(center)
-        self.move(geo.topLeft())
+        max_window_width = screen_width * max_width_ratio
+        max_window_height = screen_height * max_height_ratio
+
+        window_width = max_window_width
+        window_height = (window_width * target_aspect_height) / target_aspect_width
+
+        if window_height > max_window_height:
+            window_height = max_window_height
+            window_width = (window_height * target_aspect_width) / target_aspect_height
+
+        self.setFixedSize(int(window_width), int(window_height))
+        frame_geometry = self.frameGeometry()
+        screen_center = self.screen().availableGeometry().center()
+        frame_geometry.moveCenter(screen_center)
+        self.move(frame_geometry.topLeft())
 
 if __name__ == "__main__":
     logger = _Logger.get_logger()
