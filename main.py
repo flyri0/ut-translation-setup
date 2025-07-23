@@ -3,7 +3,7 @@ import sys
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QFrame, QApplication, QPushButton, \
-    QHBoxLayout, QMessageBox
+    QHBoxLayout, QMessageBox, QSizePolicy
 from screeninfo import get_monitors
 
 from logger import _Logger
@@ -37,10 +37,9 @@ class App(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.setContentsMargins(0, 10, 0, 10)
         main_layout.setSpacing(10)
 
-        # Page container
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack, stretch=1)
 
@@ -54,7 +53,6 @@ class App(QMainWindow):
         main_layout.addWidget(line)
 
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(10)
 
         self.cancel_button = QPushButton(_("Cancel"))
         self.back_button = QPushButton(_("Back"))
