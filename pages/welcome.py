@@ -1,85 +1,85 @@
 import gettext
-import pathlib
-from PIL import ImageTk, Image
-import ttkbootstrap as ttk
+
+from PySide6.QtCore import Qt, QMargins, QSize
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QLabel, QHBoxLayout, QSizePolicy
 
 from pages.base import BasePage
 
-# TODO: Implement i18n support
 _ = gettext.gettext
-
 LOG_PREFIX = "WelcomePage:"
+
 
 class WelcomePage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
-        controller.logger.debug(f"{LOG_PREFIX} loaded")
-        controller.title(_("Translation Installer: Welcome"))
 
-        self._display_banner()
-        self._display_message()
+        self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
+        self._build_ui()
 
-        self.rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=0)
-        self.grid_columnconfigure(1, weight=1)
+    def _build_ui(self):
+        main_layout = QHBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-    def _display_message(self):
-        def update_wraplength(event):
-            message_label.config(wraplength=container.winfo_width() - 30)
+        # QLabel support some HTML tags: https://doc.qt.io/qt-6/richtext-html-subset.html
+        message = QLabel(_(
+            """
+            <h2>Until Then... <i>In portuguese!</i></h2>
+            <p>
+                Thank you for being here! This translation was made with love
+                by fans, so that more people can experience the story of <i>Until Then</i>
+                in our language, We hope you get as emotional as we did.
+            </p>
+            <br>
+            <center>
+                <i>
+                    Translation by:<br>
+                    person · person · person · person<br><br>
+                    
+                    Installer by:<br>
+                    <a href="https://github.com/flyri0">flyr0</a>
+                    <br>
+                </i>
+                <br>
+                <a href="https://discord.gg/MKn6QBVG9g">Discord</a>
+                ·
+                <a href="https://github.com/flyri0/ut-translation-setup">Github</a>
+            </center>
+            """
+        ))
+        message.setWordWrap(True)
+        message.setOpenExternalLinks(True)
+        message.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        message.setContentsMargins(QMargins(10, 0, 10, 0))
 
-        bold_font = ("TkDefaultFont", 12, "bold")
-        italic_font = ("TkDefaultFont", 9, "italic")
+        banner = ScaledLabel()
+        banner.setPixmap(QPixmap(":/assets/banner.jpg"))
 
-        container = ttk.Frame(self)
-        container.grid(row=0, column=1, sticky="nsew")
+        main_layout.addWidget(banner)
+        main_layout.addWidget(message, stretch=1)
 
-        for i in (0, 6):
-            container.rowconfigure(i, weight=1)
-        for i in range(1, 6):
-            container.rowconfigure(i, weight=0)
-        container.columnconfigure(0, weight=1)
-
-        ttk.Label(container, text=_("Until Then... in portuguese!"), font=bold_font) \
-            .grid(row=1, column=0, pady=(0, 10), sticky="n")
-
-        message_label = ttk.Label(
-            container,
-            text=_(
-                "Thank you for being here. This translation was made with love by fans, "
-                "so that more people can experience the story of Until Then in our language. "
-                "We hope you get as emotional as we did."
-            )
+class ScaledLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._pixmap = None
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
         )
-        message_label.grid(row=2, column=0, sticky="n")
-        message_label.bind("<Configure>", update_wraplength)
 
-        ttk.Label(container, text=_("Translation by: someone"), font=italic_font) \
-            .grid(row=4, column=0, pady=(30, 0), sticky="s")
+    def setPixmap(self, pixmap: QPixmap):
+        self._pixmap = pixmap
+        super().setPixmap(pixmap)
 
-        ttk.Label(container, text=_("Installer by: someone"), font=italic_font) \
-            .grid(row=5, column=0, sticky="s")
 
-    def _display_banner(self):
-        banner_path = pathlib.Path(__file__).parent.parent / "assets" / "banner.jpg"
-        window_height = self.controller.winfo_height()
-
-        try:
-            banner_source = Image.open(banner_path)
-            self.controller.logger.debug(f"{LOG_PREFIX} Banner image loaded from {banner_path}")
-        except Exception as banner_path_error:
-            self.controller.logger.warning(f"{LOG_PREFIX} Failed to load banner image from {banner_path}: {banner_path_error}")
-            banner_source = None
-
-        if banner_source is not None:
-            aspect_ratio = banner_source.width / banner_source.height
-            self.resized_banner_source = banner_source.resize(
-                (
-                    int(window_height * aspect_ratio),
-                    window_height
-                ),
-                Image.Resampling.BILINEAR
+    def resizeEvent(self, event):
+        if self._pixmap:
+            scaled = self._pixmap.scaled(
+                QSize(int(self._pixmap.width() * self.height() / self._pixmap.height()), self.height()),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
             )
-            self.banner = ImageTk.PhotoImage(self.resized_banner_source)
-
-            self.banner_label = ttk.Label(self, image=self.banner, borderwidth=0) # type: ignore
-            self.banner_label.grid(row=0, column=0, sticky="nsew")
+            super().setPixmap(scaled)
+        super().resizeEvent(event)

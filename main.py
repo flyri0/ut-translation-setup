@@ -1,186 +1,157 @@
 import gettext
-import pathlib
-import tkinter.messagebox
+import sys
 
-import darkdetect
-import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
-from typing import Type, Optional
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QFrame, QApplication, QPushButton, \
+    QHBoxLayout, QMessageBox
 from screeninfo import get_monitors
 
 from logger import _Logger
-from pages.base import BasePage
-from pages.select_game_path import SelectGamePathPage
+from pages.select_game_path import SelectGamePath
 from pages.welcome import WelcomePage
 from state import AppState
 
-page_sequence: list[Type[BasePage]] = [
-    WelcomePage,
-    SelectGamePathPage,
-]
+import assets # type: ignore
 
-# TODO: Implement i18n support
 _ = gettext.gettext
-
 LOG_PREFIX = "App:"
 
-class App(ttk.Window):
-    def __init__(self, theme_name: str = "cosmo"):
-        super().__init__(themename=theme_name)
-
-        self.report_callback_exception = self._handle_exception
-        self.protocol("WM_DELETE_WINDOW", self._handle_exit)
+class App(QMainWindow):
+    def __init__(self):
+        super().__init__()
 
         self.state = AppState()
         self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Initialized")
 
-        self._center_window()
-        self._set_icon()
-        self.title(_("Until Then - Install Translation"))
-
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.container = ttk.Frame(self)
-        self.container.grid(row=0, column=0, sticky="nsew")
-        self.container.grid_rowconfigure(0, weight=1)
-        self.container.grid_columnconfigure(0, weight=1)
-
-        controls_container = ttk.Frame(self)
-        controls_container.grid(row=1, column=0, sticky="ew")
-        controls_container.grid_columnconfigure(0, weight=1)
-
-        ttk.Separator(controls_container, orient="horizontal", style=SECONDARY).grid(row=0, column=0, columnspan=3, sticky="ew")
-
-        self.cancel_button = ttk.Button(
-            controls_container,
-            text=_("Cancel"),
-            style=f'{OUTLINE},{DANGER}',
-            cursor="hand2",
-            command=lambda: self._handle_exit())
-        self.cancel_button.grid(row=1, column=0, sticky="w", pady=10, padx=(10, 0))
-
-        self.back_button = ttk.Button(
-            controls_container,
-            text=_("Back"),
-            style=OUTLINE,
-            cursor="hand2",
-            command=lambda: self._previous_page())
-        self.back_button.grid(row=1, column=1, sticky="w", pady=10, padx=(0, 10))
-
-        self.next_button = ttk.Button(
-            controls_container,
-            text=_("Next"),
-            style=OUTLINE,
-            cursor="hand2",
-            command=lambda: self._next_page())
-        self.next_button.grid(row=1, column=2, sticky="e", pady=10, padx=(0, 10))
-
-        self.page_sequence = page_sequence
+        self.page_sequence = [WelcomePage, SelectGamePath]
         self.current_index: int = 0
-        self.current_page: Optional[ttk.Frame] = None
+
+        self._build_ui()
+        self.setWindowIcon(QIcon(":/assets/icon.ico"))
+        self.setWindowTitle(_("Until Then - Install Translation"))
+        self._center_window()
         self._show_page(0)
 
-    def _update_navigation_buttons(self):
-        if self.current_index == 0:
-            self.back_button.configure(state="disabled", cursor="arrow")
-        else:
-            self.back_button.configure(state="normal", cursor="hand2")
+    def _build_ui(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        main_layout = QVBoxLayout(central)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        if self.current_index == len(self.page_sequence) - 1:
-            self.next_button.configure(state="disabled", cursor="arrow")
-        else:
-            self.next_button.configure(state="normal", cursor="hand2")
+        self.stack = QStackedWidget()
+        main_layout.addWidget(self.stack, stretch=1)
 
-    def _next_page(self):
-        if self.current_index < len(self.page_sequence) - 1:
-            self._show_page(self.current_index + 1)
+        for page_cls in self.page_sequence:
+            page = page_cls(parent=self, controller=self)
+            self.stack.addWidget(page)
 
-    def _previous_page(self):
-        if self.current_index > 0:
-            self._show_page(self.current_index - 1)
+        line = QFrame()
+        line.setFrameShape(QFrame.Shape.HLine)
+        line.setFrameShadow(QFrame.Shadow.Sunken)
+        main_layout.addWidget(line)
+
+        button_layout = QHBoxLayout()
+
+        self.cancel_button = QPushButton(_("Cancel"))
+        self.back_button = QPushButton(_("Back"))
+        self.next_button = QPushButton(_("Next"))
+
+        self.cancel_button.clicked.connect(self.close)
+        self.back_button.clicked.connect(self._previous_page)
+        self.next_button.clicked.connect(self._next_page)
+
+        button_layout.addWidget(self.cancel_button)
+        button_layout.addStretch(1)
+        button_layout.addWidget(self.back_button)
+        button_layout.addWidget(self.next_button)
+
+        button_container = QWidget()
+        button_container.setLayout(button_layout)
+
+        main_layout.addWidget(button_container)
 
     def _show_page(self, index: int):
-        if not (0 <= index < len(self.page_sequence)):
+        if not (0 <= index < self.stack.count()):
             self.logger.warning(f"{LOG_PREFIX} Page index {index} out of bounds")
             return
 
-        if self.current_page is not None:
-            self.logger.debug(f"{LOG_PREFIX} Destroying page {type(self.current_page).__name__}")
-            self.current_page.destroy()
-
-        page_class = self.page_sequence[index]
-        page = page_class(parent=self.container, controller=self)
-        page.grid(row=0, column=0, sticky="nsew")
-        self.current_page = page
+        self.stack.setCurrentIndex(index)
         self.current_index = index
-
-        self.logger.info(f"{LOG_PREFIX} Page {type(page).__name__} displayed")
-
+        self.logger.info(f"{LOG_PREFIX} Page {type(self.stack.currentWidget()).__name__} displayed")
         self._update_navigation_buttons()
 
-    def _set_icon(self):
-        icon_path = pathlib.Path(__file__).parent / "assets" / "icon.ico"
+    def _next_page(self):
+        self._show_page(self.current_index + 1)
 
-        try:
-            self.iconbitmap(default=str(icon_path))
-            self.iconbitmap(str(icon_path))
-            self.logger.debug(f"{LOG_PREFIX} Icon set from {icon_path}")
-        except Exception as error:
-            self.logger.warning(f"{LOG_PREFIX} Failed to set icon from {icon_path}: {error}")
+    def _previous_page(self):
+        self._show_page(self.current_index - 1)
+
+    def _update_navigation_buttons(self):
+        self.back_button.setEnabled(self.current_index > 0)
+        self.next_button.setEnabled(self.current_index < self.stack.count() - 1)
 
     def _center_window(self):
-        screen_width, screen_height = None, None
         for monitor in get_monitors():
             if monitor.is_primary:
-                screen_width = monitor.width
-                screen_height = monitor.height
-                self.logger.debug(f"{LOG_PREFIX} Primary monitor detected: {monitor.name} with dimensions {monitor.width}x{monitor.height}")
+                screen_width, screen_height = monitor.width, monitor.height
                 break
-
-        window_width = int(screen_width * 0.4)
-        window_height = int(screen_height * 0.5)
-        position_x = int(screen_width - window_width) // 2
-        position_y = int(screen_height - window_height) // 2
-
-        self.logger.debug(f"{LOG_PREFIX} Window size set to {window_width}x{window_height} at ({position_x}, {position_y})")
-        self.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
-
-    def _handle_exit(self):
-        self.logger.info(f"{LOG_PREFIX} Termination requested by user")
-        if tkinter.messagebox.askyesno(_("Exit"), _("Are you sure you want to exit?")):
-            self.destroy()
         else:
-            self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
+            screen_width, screen_height = 1280, 720
 
-    def _handle_exception(self, exc_type, exc_value, exc_traceback):
-        self.logger.error("Unhandled exception in Tkinter callback", exc_info=(exc_type, exc_value, exc_traceback))
+        target_aspect_width, target_aspect_height = 4, 3 # target aspect ratio (width x height)
+        max_width_ratio, max_height_ratio = 0.5, 0.5 # maximum fraction of the screen the window may occupy in %
 
-        tkinter.messagebox.showerror(
-            _("An unexpected error has occurred"),
-            f"A log file was generated at: {_Logger.get_log_file_path()}"
-        )
+        max_window_width = screen_width * max_width_ratio
+        max_window_height = screen_height * max_height_ratio
 
-        self.destroy()
+        window_width = max_window_width
+        window_height = (window_width * target_aspect_height) / target_aspect_width
+
+        if window_height > max_window_height:
+            window_height = max_window_height
+            window_width = (window_height * target_aspect_width) / target_aspect_height
+
+        self.setFixedSize(int(window_width), int(window_height))
+        frame_geometry = self.frameGeometry()
+        screen_center = self.screen().availableGeometry().center()
+        frame_geometry.moveCenter(screen_center)
+        self.move(frame_geometry.topLeft())
+
+    def closeEvent(self, event):
+        self.logger.info(f"{LOG_PREFIX} Termination requested by user")
+        message_box = QMessageBox(parent=self)
+        message_box.setWindowTitle("Exit?")
+        message_box.setText("Are you sure you want to exit?")
+        message_box.setIcon(QMessageBox.Icon.Question)
+        message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        message_box.setDefaultButton(QMessageBox.StandardButton.No)
+
+        result = message_box.exec()
+
+        match result:
+            case QMessageBox.StandardButton.Yes:
+                event.accept()
+                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
+            case QMessageBox.StandardButton.No:
+                event.ignore()
 
 if __name__ == "__main__":
     logger = _Logger.get_logger()
-    theme = "litera"
-
     try:
-        if darkdetect.isDark():
-            logger.info(f"{LOG_PREFIX} Dark mode detected")
-            theme = "darkly"
-
-        app = App(theme_name=theme)
-        app.mainloop()
+        app = QApplication([])
+        main_window = App()
+        main_window.show()
+        sys.exit(app.exec())
     except Exception:
-        # Only handles setup/startup errors now
-        logger.exception("Unhandled exception occurred during runtime")
-        tkinter.messagebox.showerror(
-            _("An unexpected error has occurred"),
-            f"A log file was generated at: {_Logger.get_log_file_path()}"
+        logger.exception(f"{LOG_PREFIX} Unhandled exception occurred during runtime")
+        QMessageBox.critical(
+            None,
+            _("Error"),
+            _(f"An unexpected error has occurred.\nA log file was generated at: {_Logger.get_log_file_path()}"),
+            QMessageBox.StandardButton.Ok
         )
     finally:
-        if logger is not None:
+        if logger:
             logger.info(f"{LOG_PREFIX} Terminated")
