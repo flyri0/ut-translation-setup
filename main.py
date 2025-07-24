@@ -1,6 +1,7 @@
 import gettext
 import sys
 
+import qtawesome
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QFrame, QApplication, QPushButton, \
     QHBoxLayout, QMessageBox
@@ -54,9 +55,9 @@ class App(QMainWindow):
 
         button_layout = QHBoxLayout()
 
-        self.cancel_button = QPushButton(_("Cancel"))
-        self.back_button = QPushButton(_("Back"))
-        self.next_button = QPushButton(_("Next"))
+        self.cancel_button = QPushButton(qtawesome.icon("fa6s.xmark"), _("Cancel"))
+        self.back_button = QPushButton(qtawesome.icon("fa6s.chevron-left"), _("Back"))
+        self.next_button = QPushButton(qtawesome.icon("fa6s.chevron-right"), _("Next"))
 
         self.cancel_button.clicked.connect(self.close)
         self.back_button.clicked.connect(self._previous_page)
