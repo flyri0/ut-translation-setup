@@ -1,8 +1,9 @@
 import gettext
 
+import qtawesome
 from PySide6.QtCore import Qt, QMargins, QSize
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QLabel, QHBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout, QFrame
 
 from pages.base import BasePage
 
@@ -36,28 +37,44 @@ class WelcomePage(BasePage):
                 <i>
                     Translation by:<br>
                     person · person · person · person<br><br>
-                    
+
                     Installer by:<br>
                     <a href="https://github.com/flyri0">flyr0</a>
                     <br>
                 </i>
                 <br>
-                <a href="https://discord.gg/MKn6QBVG9g">Discord</a>
-                ·
-                <a href="https://github.com/flyri0/ut-translation-setup">Github</a>
             </center>
             """
         ))
         message.setWordWrap(True)
         message.setOpenExternalLinks(True)
+        message.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         message.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
         message.setContentsMargins(QMargins(10, 0, 10, 0))
+
+        socials = QLabel(_(
+            """
+                <div>
+                    <a style="text-decoration: none;" href=\"https://github.com/flyri0/ut-translation-setup\">\uf392</a>
+                    <a style="text-decoration: none;" href=\"https://discord.gg/Kv3XSDRR3H\">\uf09b</a>
+                </div>
+            """))
+        socials.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        socials.setOpenExternalLinks(True)
+        socials.setContentsMargins(QMargins(0, 0, 0, 50))
+        socials.setFont(qtawesome.font("fa6b", 26))
+
+        message_frame = QFrame()
+        message_frame.setLayout(QVBoxLayout(message_frame))
+        message_frame.layout().addWidget(message)
+        message_frame.layout().addWidget(socials)
 
         banner = ScaledLabel()
         banner.setPixmap(QPixmap(":/assets/banner.jpg"))
 
         main_layout.addWidget(banner)
-        main_layout.addWidget(message, stretch=1)
+        main_layout.addWidget(message_frame, stretch=1)
+
 
 class ScaledLabel(QLabel):
     def __init__(self, parent=None):
@@ -72,7 +89,6 @@ class ScaledLabel(QLabel):
     def setPixmap(self, pixmap: QPixmap):
         self._pixmap = pixmap
         super().setPixmap(pixmap)
-
 
     def resizeEvent(self, event):
         if self._pixmap:
