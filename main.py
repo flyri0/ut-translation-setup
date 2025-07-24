@@ -94,17 +94,20 @@ class App(QMainWindow):
 
     def _handle_exit(self):
         self.logger.info(f"{LOG_PREFIX} Termination requested by user")
-        reply = QMessageBox.question(
-            self,
-            _("Exit"),
-            _("Are you sure you want to exit?"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
+        message_box = QMessageBox(parent=self)
+        message_box.setWindowTitle("Exit?")
+        message_box.setText("Are you sure you want to exit?")
+        message_box.setIcon(QMessageBox.Icon.Question)
+        message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        message_box.setDefaultButton(QMessageBox.StandardButton.No)
 
-        if reply == QMessageBox.StandardButton.Yes:
-            self.close()
-        else:
-            self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
+        result = message_box.exec()
+
+        match result:
+            case QMessageBox.StandardButton.Yes:
+                self.close()
+            case QMessageBox.StandardButton.No:
+                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
 
     def _center_window(self):
         for monitor in get_monitors():
