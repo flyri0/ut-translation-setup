@@ -3,7 +3,7 @@ import sys
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QFrame, QApplication, QPushButton, \
-    QHBoxLayout, QMessageBox, QSizePolicy
+    QHBoxLayout, QMessageBox
 from screeninfo import get_monitors
 
 from logger import _Logger
@@ -11,7 +11,7 @@ from pages.select_game_path import SelectGamePath
 from pages.welcome import WelcomePage
 from state import AppState
 
-import assets
+import assets # type: ignore
 
 _ = gettext.gettext
 LOG_PREFIX = "App:"
@@ -58,7 +58,7 @@ class App(QMainWindow):
         self.back_button = QPushButton(_("Back"))
         self.next_button = QPushButton(_("Next"))
 
-        self.cancel_button.clicked.connect(self._handle_exit)
+        self.cancel_button.clicked.connect(self.close)
         self.back_button.clicked.connect(self._previous_page)
         self.next_button.clicked.connect(self._next_page)
 
@@ -92,23 +92,6 @@ class App(QMainWindow):
         self.back_button.setEnabled(self.current_index > 0)
         self.next_button.setEnabled(self.current_index < self.stack.count() - 1)
 
-    def _handle_exit(self):
-        self.logger.info(f"{LOG_PREFIX} Termination requested by user")
-        message_box = QMessageBox(parent=self)
-        message_box.setWindowTitle("Exit?")
-        message_box.setText("Are you sure you want to exit?")
-        message_box.setIcon(QMessageBox.Icon.Question)
-        message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        message_box.setDefaultButton(QMessageBox.StandardButton.No)
-
-        result = message_box.exec()
-
-        match result:
-            case QMessageBox.StandardButton.Yes:
-                self.close()
-            case QMessageBox.StandardButton.No:
-                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
-
     def _center_window(self):
         for monitor in get_monitors():
             if monitor.is_primary:
@@ -117,7 +100,7 @@ class App(QMainWindow):
         else:
             screen_width, screen_height = 1280, 720
 
-        target_aspect_width, target_aspect_height = 4, 3 # target aspect ratio (width : height)
+        target_aspect_width, target_aspect_height = 4, 3 # target aspect ratio (width x height)
         max_width_ratio, max_height_ratio = 0.5, 0.5 # maximum fraction of the screen the window may occupy in %
 
         max_window_width = screen_width * max_width_ratio
@@ -135,6 +118,24 @@ class App(QMainWindow):
         screen_center = self.screen().availableGeometry().center()
         frame_geometry.moveCenter(screen_center)
         self.move(frame_geometry.topLeft())
+
+    def closeEvent(self, event):
+        self.logger.info(f"{LOG_PREFIX} Termination requested by user")
+        message_box = QMessageBox(parent=self)
+        message_box.setWindowTitle("Exit?")
+        message_box.setText("Are you sure you want to exit?")
+        message_box.setIcon(QMessageBox.Icon.Question)
+        message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        message_box.setDefaultButton(QMessageBox.StandardButton.No)
+
+        result = message_box.exec()
+
+        match result:
+            case QMessageBox.StandardButton.Yes:
+                event.accept()
+                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
+            case QMessageBox.StandardButton.No:
+                event.ignore()
 
 if __name__ == "__main__":
     logger = _Logger.get_logger()
