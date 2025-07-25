@@ -135,8 +135,8 @@ class App(QMainWindow):
         match result:
             case QMessageBox.StandardButton.Yes:
                 event.accept()
-                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
             case QMessageBox.StandardButton.No:
+                self.logger.info(f"{LOG_PREFIX} Termination aborted by user")
                 event.ignore()
 
 if __name__ == "__main__":

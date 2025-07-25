@@ -1,7 +1,7 @@
 import gettext
 
 import qtawesome
-from PySide6.QtCore import Qt, QMargins, QSize
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout, QFrame
 
@@ -50,18 +50,17 @@ class WelcomePage(BasePage):
         message.setOpenExternalLinks(True)
         message.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         message.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        message.setContentsMargins(QMargins(10, 0, 10, 0))
+        message.setContentsMargins(10, 0, 10, 0)
 
         socials = QLabel(_(
             """
                 <div>
-                    <a style="text-decoration: none;" href=\"https://github.com/flyri0/ut-translation-setup\">\uf392</a>
-                    <a style="text-decoration: none;" href=\"https://discord.gg/Kv3XSDRR3H\">\uf09b</a>
+                    <a style="text-decoration: none;" href=\"https://discord.gg/Kv3XSDRR3H\">\uf392 <!--discord icon in fontawesome--></a>
+                    <a style="text-decoration: none;" href=\"https://github.com/flyri0/ut-translation-setup\">\uf09b <!--github icon in fontawesome--></a>
                 </div>
             """))
-        socials.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        socials.setAlignment(Qt.AlignmentFlag.AlignCenter)
         socials.setOpenExternalLinks(True)
-        socials.setContentsMargins(QMargins(0, 0, 0, 50))
         socials.setFont(qtawesome.font("fa6b", 26))
 
         message_frame = QFrame()

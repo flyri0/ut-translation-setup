@@ -119,7 +119,7 @@ class SelectGamePathPage(BasePage):
         for game_id in [FULL_GAME_ID, DEMO_GAME_ID]:
             path = self._find_game_path_by_id(game_id)
             if path is not None:
-                self.controller.logger.info(f"{LOG_PREFIX} the {game_id == FULL_GAME_ID if 'full' else 'demo' } version of Until Then was found")
+                self.controller.logger.info(f"{LOG_PREFIX} The {"full" if game_id==FULL_GAME_ID else "demo" } version of Until Then was found")
                 self.controller.state.game_path = path
                 self.controller.state.is_demo = (game_id == DEMO_GAME_ID)
                 return
@@ -174,15 +174,22 @@ class SelectGamePathPage(BasePage):
         self.controller.logger.debug(f"{LOG_PREFIX} Trying to find steam path")
 
         system = platform.system()
+        possible_paths = []
 
         match system:
             case "Windows":
-                steam_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
-                steam_path = winreg.QueryValueEx(steam_key, "SteamPath")
-                winreg.CloseKey(steam_key)
+                try:
+                    steam_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
+                    steam_path = winreg.QueryValueEx(steam_key, "SteamPath")
+                    winreg.CloseKey(steam_key)
+                except FileNotFoundError:
+                    self.controller.logger.warning(f"{LOG_PREFIX} Steam path not found in winreg")
+                    steam_path = None
+
+                if steam_path:
+                    possible_paths.append(Path(steam_path[0]))
 
                 possible_paths = [
-                    Path(steam_path[0]),
                     Path(os.environ.get("ProgramFiles(x86)")) / "Steam",
                     Path(os.environ.get("ProgramFiles", "")) / "Steam",
                 ]
