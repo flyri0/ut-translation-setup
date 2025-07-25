@@ -6,7 +6,7 @@ from pathlib import Path
 
 import qtawesome
 import vdf
-from PySide6.QtCore import QTimer
+
 from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QGroupBox, QHBoxLayout, QSizePolicy, QPushButton, QFrame, \
     QMessageBox, QFileDialog
@@ -26,14 +26,6 @@ class SelectGamePathPage(BasePage):
 
         self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
         self._build_ui()
-
-    def showEvent(self, event):
-        super().showEvent(event)
-
-        self.controller.next_button.setEnabled(False)
-        # A little workaround because I'm too lazy to deal with threads
-        QTimer.singleShot(0, self.find_until_then_path)
-        QTimer.singleShot(0, self.validate_path)
 
     def _build_ui(self):
         main_layout = QVBoxLayout(self)
@@ -58,10 +50,16 @@ class SelectGamePathPage(BasePage):
         self.select_button.setIcon(qtawesome.icon("fa6s.folder-open"))
         self.select_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
+        self.search_button = QPushButton(_("Auto find"))
+        self.search_button.clicked.connect(self._find_and_validate)
+        self.search_button.setIcon(qtawesome.icon("fa6s.magnifying-glass"))
+        self.search_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
         controls_frame = QFrame()
         controls_frame.setLayout(QHBoxLayout(controls_frame))
         controls_frame.layout().setContentsMargins(0, 0, 0, 0)
         controls_frame.layout().addWidget(self.status_label)
+        controls_frame.layout().addWidget(self.search_button)
         controls_frame.layout().addWidget(self.select_button)
 
         main_layout.addWidget(path_label_box)
@@ -69,9 +67,18 @@ class SelectGamePathPage(BasePage):
 
         self.exe_not_found_message = QMessageBox(parent=self.controller)
         self.exe_not_found_message.setWindowTitle(_("Until Then executable not found"))
-        self.exe_not_found_message.setText(_("We couldn’t locate 'UntilThen.exe' automatically\nPlease choose the game’s folder manually."))
+        self.exe_not_found_message.setText(_("We couldn’t locate 'UntilThen.exe' automatically\nPlease choose the game’s executable manually."))
         self.exe_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.exe_not_found_message.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+    def _find_and_validate(self):
+        self._find_until_then_path()
+        self._validate_path()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+        self.controller.next_button.setEnabled(False)
 
     def _handle_select(self):
         selected_path_dialog = QFileDialog(parent=self.controller)
@@ -84,9 +91,9 @@ class SelectGamePathPage(BasePage):
         if selected_path:
             self.path_label.setText(selected_path)
             self.controller.state.game_path = Path(selected_path).parent
-        self.validate_path()
+        self._validate_path()
 
-    def validate_path(self):
+    def _validate_path(self):
         game_path = self.controller.state.game_path
         exe_path = game_path / GAME_EXE_NAME if game_path else None
 
@@ -95,6 +102,7 @@ class SelectGamePathPage(BasePage):
             self.status_label.setText(_("UntilThen.exe not found"))
             self.status_label.setStyleSheet("color: #fb2c36")
             self.controller.next_button.setEnabled(False)
+            self.search_button.setEnabled(True)
             self.exe_not_found_message.exec()
         else:
             self.controller.logger.info(f"{LOG_PREFIX} Valid Until Then executable found at {exe_path}")
@@ -102,8 +110,9 @@ class SelectGamePathPage(BasePage):
             self.status_label.setText(_("UntilThen.exe found"))
             self.status_label.setStyleSheet("color: #00c951")
             self.controller.next_button.setEnabled(True)
+            self.search_button.setEnabled(False)
 
-    def find_until_then_path(self):
+    def _find_until_then_path(self):
         if self.controller.state.game_path is not None:
             return
 
