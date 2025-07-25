@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget,
 from screeninfo import get_monitors
 
 from logger import _Logger
-from pages.select_game_path import SelectGamePath
+from pages.select_game_path import SelectGamePathPage
 from pages.welcome import WelcomePage
 from state import AppState
 
@@ -25,7 +25,7 @@ class App(QMainWindow):
         self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Initialized")
 
-        self.page_sequence = [WelcomePage, SelectGamePath]
+        self.page_sequence = [WelcomePage, SelectGamePathPage]
         self.current_index: int = 0
 
         self._build_ui()
@@ -36,6 +36,7 @@ class App(QMainWindow):
 
     def _build_ui(self):
         central = QWidget()
+        central.setStyleSheet("QPushButton { padding: 10px; }")
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
         main_layout.setContentsMargins(0, 0, 0, 0)
