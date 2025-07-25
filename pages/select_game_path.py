@@ -91,7 +91,7 @@ class SelectGamePathPage(BasePage):
         exe_path = game_path / GAME_EXE_NAME if game_path else None
 
         if not exe_path or not exe_path.is_file():
-            self.controller.logger.warning(f"{LOG_PREFIX} Valid Until Then executable not found at {exe_path}")
+            self.controller.logger.warning(f"{LOG_PREFIX} Valid Until Then executable not found")
             self.status_label.setText(_("UntilThen.exe not found"))
             self.status_label.setStyleSheet("color: #fb2c36")
             self.controller.next_button.setEnabled(False)
