@@ -6,7 +6,7 @@ from pathlib import Path
 
 import qtawesome
 import vdf
-from PySide6.QtCore import QObject, Signal, Slot, QTimer
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QGroupBox, QHBoxLayout, QSizePolicy, QPushButton, QFrame, \
     QMessageBox, QFileDialog
@@ -72,9 +72,6 @@ class SelectGamePathPage(BasePage):
         self.exe_not_found_message.setText(_("We couldn’t locate 'UntilThen.exe' automatically\nPlease choose the game’s folder manually."))
         self.exe_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.exe_not_found_message.setStandardButtons(QMessageBox.StandardButton.Ok)
-
-        self.find_until_then_path()
-        print(self.controller.state.game_path)
 
     def _handle_select(self):
         selected_path_dialog = QFileDialog(parent=self.controller)
