@@ -13,7 +13,7 @@ LOG_PREFIX = "WelcomePage:"
 
 class WelcomePage(BasePage):
     def __init__(self, parent, controller):
-        super().__init__(parent, controller)
+        super().__init__(parent, controller, window_title=_("Welcome"))
 
         self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
         self._build_ui()
@@ -69,7 +69,7 @@ class WelcomePage(BasePage):
         message_frame.layout().addWidget(socials)
 
         banner = ScaledLabel()
-        banner.setPixmap(QPixmap(":/assets/banner.jpg"))
+        banner.setPixmap(QPixmap(":/assets/banner.png"))
 
         main_layout.addWidget(banner)
         main_layout.addWidget(message_frame, stretch=1)

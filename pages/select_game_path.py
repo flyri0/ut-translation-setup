@@ -22,7 +22,7 @@ LOG_PREFIX = "SelectGamePathPage:"
 
 class SelectGamePathPage(BasePage):
     def __init__(self, parent, controller):
-        super().__init__(parent, controller)
+        super().__init__(parent, controller, window_title="Select Game Path")
 
         self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
         self._build_ui()
