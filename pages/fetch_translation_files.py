@@ -3,7 +3,6 @@ import gettext
 from PySide6.QtWidgets import QVBoxLayout, QLabel
 
 from pages.base import BasePage
-from pages.welcome import WelcomePage
 
 _ = gettext.gettext
 
