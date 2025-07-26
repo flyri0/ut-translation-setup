@@ -30,7 +30,6 @@ class SelectGamePathPage(BasePage):
     def _build_ui(self):
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.setContentsMargins(50, 0, 50, 0)
 
         self.path_label = QLabel()
 

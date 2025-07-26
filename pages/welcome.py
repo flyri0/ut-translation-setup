@@ -68,33 +68,4 @@ class WelcomePage(BasePage):
         message_frame.layout().addWidget(message)
         message_frame.layout().addWidget(socials)
 
-        banner = ScaledLabel()
-        banner.setPixmap(QPixmap(":/assets/banner.png"))
-
-        main_layout.addWidget(banner)
-        main_layout.addWidget(message_frame, stretch=1)
-
-
-class ScaledLabel(QLabel):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._pixmap = None
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
-        )
-
-    def setPixmap(self, pixmap: QPixmap):
-        self._pixmap = pixmap
-        super().setPixmap(pixmap)
-
-    def resizeEvent(self, event):
-        if self._pixmap:
-            scaled = self._pixmap.scaled(
-                QSize(int(self._pixmap.width() * self.height() / self._pixmap.height()), self.height()),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-            super().setPixmap(scaled)
-        super().resizeEvent(event)
+        main_layout.addWidget(message_frame)

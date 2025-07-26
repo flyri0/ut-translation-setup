@@ -5,7 +5,7 @@ from PySide6.QtGui import QShowEvent
 from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
-    from main import App
+    from app import App
 
 _ = gettext.gettext
 
