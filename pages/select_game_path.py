@@ -63,6 +63,11 @@ class SelectGamePathPage(BasePage):
         main_layout.addWidget(controls_frame)
         main_layout.addWidget(self.status_label)
 
+        self.select_path_dialog = QFileDialog(parent=self.controller)
+        self.select_path_dialog.setWindowTitle(_("Selecionar UntilThen.exe"))
+        self.select_path_dialog.setNameFilter("UntilThen.exe")
+        self.select_path_dialog.setDirectory(str(Path.home().absolute().resolve()))
+
         self.exe_not_found_message = QMessageBox(parent=self.controller)
         self.exe_not_found_message.setWindowTitle(_("Executável não encontrado"))
         self.exe_not_found_message.setText(_("Não foi possível localizar o arquivo “UntilThen.exe” automaticamente"
@@ -87,17 +92,16 @@ class SelectGamePathPage(BasePage):
         self.controller.back_button.setEnabled(True)
 
     def _handle_select(self):
-        selected_path_dialog = QFileDialog(parent=self.controller)
-        selected_path_dialog.setWindowTitle(_("Selecionar UntilThen.exe"))
-        selected_path_dialog.setNameFilter("UntilThen.exe")
-        selected_path_dialog.exec()
+        self.select_path_dialog.exec()
 
-        selected_files = selected_path_dialog.selectedFiles()
+        selected_files = self.select_path_dialog.selectedFiles()
         selected_path = selected_files[0] if selected_files else None
 
         if selected_path:
             self.path_label.setText(selected_path)
             self.controller.state.game_path = Path(selected_path).parent
+            self._validate_path()
+            return
 
         self.file_not_selected_message.exec()
 
