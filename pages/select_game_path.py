@@ -34,22 +34,22 @@ class SelectGamePathPage(BasePage):
         self.path_label = QLabel()
 
         path_label_box = QGroupBox()
-        path_label_box.setTitle(_("Selected Path"))
+        path_label_box.setTitle(_("Local Selecionado"))
         path_label_box.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
         path_label_box.setLayout(QHBoxLayout())
         path_label_box.layout().addWidget(self.path_label)
 
         self.status_label = QLabel()
         self.status_label.setObjectName("status_label")
-        self.status_label.setText(_("No executable selected"))
+        self.status_label.setText(_("Nenhum executável selecionado"))
         self.status_label.setStyleSheet("color: #6a7282; font-weight: bold;")
 
-        self.select_button = QPushButton(_("Select"))
+        self.select_button = QPushButton(_("Selecionar"))
         self.select_button.clicked.connect(self._handle_select)
         self.select_button.setIcon(qtawesome.icon("fa6s.folder-open"))
         self.select_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
-        self.search_button = QPushButton(_("Auto find"))
+        self.search_button = QPushButton(_("Encontrar Automaticamente"))
         self.search_button.clicked.connect(self._find_and_validate)
         self.search_button.setIcon(qtawesome.icon("fa6s.magnifying-glass"))
         self.search_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -65,8 +65,8 @@ class SelectGamePathPage(BasePage):
         main_layout.addWidget(controls_frame)
 
         self.exe_not_found_message = QMessageBox(parent=self.controller)
-        self.exe_not_found_message.setWindowTitle(_("Until Then executable not found"))
-        self.exe_not_found_message.setText(_("We couldn’t locate 'UntilThen.exe' automatically\nPlease choose the game’s executable manually."))
+        self.exe_not_found_message.setWindowTitle(_("Executável não encontrado"))
+        self.exe_not_found_message.setText(_("Não foi possível localizar o arquivo “UntilThen.exe” automaticamente.\n Por favor, selecione o executável do jogo manualmente."))
         self.exe_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.exe_not_found_message.setStandardButtons(QMessageBox.StandardButton.Ok)
 
@@ -82,7 +82,7 @@ class SelectGamePathPage(BasePage):
 
     def _handle_select(self):
         selected_path_dialog = QFileDialog(parent=self.controller)
-        selected_path_dialog.setWindowTitle(_("Select UntilThen.exe"))
+        selected_path_dialog.setWindowTitle(_("Selecionar UntilThen.exe"))
         selected_path_dialog.setNameFilter("UntilThen.exe")
         selected_path_dialog.exec()
 
@@ -99,7 +99,7 @@ class SelectGamePathPage(BasePage):
 
         if not exe_path or not exe_path.is_file():
             self.controller.logger.warning(f"{LOG_PREFIX} Valid Until Then executable not found")
-            self.status_label.setText(_("UntilThen.exe not found"))
+            self.status_label.setText(_("UntilThen.exe não encontrado"))
             self.status_label.setStyleSheet("color: #fb2c36")
             self.controller.next_button.setEnabled(False)
             self.search_button.setEnabled(True)
@@ -107,7 +107,7 @@ class SelectGamePathPage(BasePage):
         else:
             self.controller.logger.info(f"{LOG_PREFIX} Valid Until Then executable found at {exe_path}")
             self.path_label.setText(str(exe_path))
-            self.status_label.setText(_("UntilThen.exe found"))
+            self.status_label.setText(_("UntilThen.exe encontrado"))
             self.status_label.setStyleSheet("color: #00c951")
             self.controller.next_button.setEnabled(True)
             self.search_button.setEnabled(False)

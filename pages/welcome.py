@@ -25,19 +25,19 @@ class WelcomePage(BasePage):
         # QLabel support some HTML tags: https://doc.qt.io/qt-6/richtext-html-subset.html
         message = QLabel(_(
             """
-            <h2>Until Then... <i>In portuguese!</i></h2>
+            <h2>Until Then... <i>em português!</i></h2>
             <p>
-                Thank you for being here! This translation was made with love
-                by fans, so that more people can experience the story of <i>Until Then</i>
-                in our language, We hope you get as emotional as we did.
+                Obrigado por estar aqui! Esta tradução foi feita com amor
+                por fãs, para que mais pessoas possam conhecer a história de <i>Until Then</i>
+                em nosso idioma. Esperamos que você se emocione tanto quanto nós.
             </p>
             <br>
             <center>
                 <i>
-                    Translation by:<br>
+                    Tradução feita por:<br>
                     person · person · person · person<br><br>
 
-                    Installer by:<br>
+                    Instalador feito por:<br>
                     <a href="https://github.com/flyri0">flyr0</a>
                     <br>
                 </i>
@@ -54,7 +54,7 @@ class WelcomePage(BasePage):
         socials = QLabel(_(
             """
                 <div>
-                    <a style="text-decoration: none;" href=\"https://discord.gg/Kv3XSDRR3H\">\uf392 <!--discord icon in fontawesome--></a>
+                    <a style="text-decoration: none;" href=\"https://discord.gg/MKn6QBVG9g\">\uf392 <!--discord icon in fontawesome--></a>
                     <a style="text-decoration: none;" href=\"https://github.com/flyri0/ut-translation-setup\">\uf09b <!--github icon in fontawesome--></a>
                 </div>
             """))

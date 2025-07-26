@@ -31,7 +31,7 @@ class App(QMainWindow):
 
         self._build_ui()
         self.setWindowIcon(QIcon(":/assets/icon.ico"))
-        self.setWindowTitle(_("Until Then - Install Translation"))
+        self.setWindowTitle(_("Until Then - Instalar Tradução"))
         self._center_window()
         self._show_page(0)
 
@@ -68,9 +68,9 @@ class App(QMainWindow):
 
         button_layout = QHBoxLayout()
 
-        self.cancel_button = QPushButton(qtawesome.icon("fa6s.xmark"), _("Cancel"))
-        self.back_button = QPushButton(qtawesome.icon("fa6s.chevron-left"), _("Back"))
-        self.next_button = QPushButton(qtawesome.icon("fa6s.chevron-right"), _("Next"))
+        self.cancel_button = QPushButton(qtawesome.icon("fa6s.xmark"), _("Cancelar"))
+        self.back_button = QPushButton(qtawesome.icon("fa6s.chevron-left"), _("Voltar"))
+        self.next_button = QPushButton(qtawesome.icon("fa6s.chevron-right"), _("Próximo"))
 
         self.cancel_button.clicked.connect(self.close)
         self.back_button.clicked.connect(self._previous_page)

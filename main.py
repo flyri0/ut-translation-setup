@@ -21,8 +21,8 @@ if __name__ == "__main__":
         logger.exception(f"{LOG_PREFIX} Unhandled exception occurred during runtime")
         QMessageBox.critical(
             None,
-            _("Error"),
-            _(f"An unexpected error has occurred.\nA log file was generated at: {_Logger.get_log_file_path()}"),
+            _("Erro"),
+            _(f"Ocorreu um erro inesperado.\nUm arquivo de log foi gerado em: {_Logger.get_log_file_path()}"),
             QMessageBox.StandardButton.Ok
         )
     finally:
