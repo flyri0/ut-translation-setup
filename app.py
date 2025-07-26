@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget,
 from screeninfo import get_monitors
 
 from logger import _Logger
+from pages.fetch_translation_files import FetchTranslationFilesPage
 from pages.select_game_path import SelectGamePathPage
 from pages.welcome import WelcomePage
 from state import AppState
@@ -25,7 +26,7 @@ class App(QMainWindow):
         self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Initialized")
 
-        self.page_sequence = [WelcomePage, SelectGamePathPage]
+        self.page_sequence = [WelcomePage, SelectGamePathPage, FetchTranslationFilesPage]
         self.current_index: int = 0
 
         self._build_ui()
@@ -95,17 +96,12 @@ class App(QMainWindow):
         self.stack.setCurrentIndex(index)
         self.current_index = index
         self.logger.info(f"{LOG_PREFIX} Page {type(self.stack.currentWidget()).__name__} displayed")
-        self._update_navigation_buttons()
 
     def _next_page(self):
         self._show_page(self.current_index + 1)
 
     def _previous_page(self):
         self._show_page(self.current_index - 1)
-
-    def _update_navigation_buttons(self):
-        self.back_button.setEnabled(self.current_index > 0)
-        self.next_button.setEnabled(self.current_index < self.stack.count() - 1)
 
     def _center_window(self):
         for monitor in get_monitors():

@@ -78,6 +78,7 @@ class SelectGamePathPage(BasePage):
         super().showEvent(event)
 
         self.controller.next_button.setEnabled(False)
+        self.controller.back_button.setEnabled(True)
 
     def _handle_select(self):
         selected_path_dialog = QFileDialog(parent=self.controller)

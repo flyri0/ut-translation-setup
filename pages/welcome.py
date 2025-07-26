@@ -68,3 +68,9 @@ class WelcomePage(BasePage):
         message_frame.layout().addWidget(socials)
 
         main_layout.addWidget(message_frame)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+        self.controller.back_button.setEnabled(False)
+        self.controller.next_button.setEnabled(True)
