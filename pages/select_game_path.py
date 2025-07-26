@@ -47,7 +47,6 @@ class SelectGamePathPage(BasePage):
         self.select_button = QPushButton(_("Selecionar"))
         self.select_button.clicked.connect(self._handle_select)
         self.select_button.setIcon(qtawesome.icon("fa6s.folder-open"))
-        self.select_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
         self.search_button = QPushButton(_("Encontrar Automaticamente"))
         self.search_button.clicked.connect(self._find_and_validate)
@@ -57,18 +56,25 @@ class SelectGamePathPage(BasePage):
         controls_frame = QFrame()
         controls_frame.setLayout(QHBoxLayout(controls_frame))
         controls_frame.layout().setContentsMargins(0, 0, 0, 0)
-        controls_frame.layout().addWidget(self.status_label)
         controls_frame.layout().addWidget(self.search_button)
         controls_frame.layout().addWidget(self.select_button)
 
         main_layout.addWidget(path_label_box)
         main_layout.addWidget(controls_frame)
+        main_layout.addWidget(self.status_label)
 
         self.exe_not_found_message = QMessageBox(parent=self.controller)
         self.exe_not_found_message.setWindowTitle(_("Executável não encontrado"))
-        self.exe_not_found_message.setText(_("Não foi possível localizar o arquivo “UntilThen.exe” automaticamente.\n Por favor, selecione o executável do jogo manualmente."))
+        self.exe_not_found_message.setText(_("Não foi possível localizar o arquivo “UntilThen.exe” automaticamente"
+                                             "\nPor favor, selecione o executável do jogo manualmente."))
         self.exe_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.exe_not_found_message.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        self.file_not_selected_message = QMessageBox(parent=self.controller)
+        self.file_not_selected_message.setWindowTitle(_("Nenhum arquivo selecionado"))
+        self.file_not_selected_message.setText("Você não selecionou um executável válido\nPor favor, tente novamente.")
+        self.file_not_selected_message.setIcon(QMessageBox.Icon.Information)
+        self.file_not_selected_message.setStandardButtons(QMessageBox.StandardButton.Ok)
 
     def _find_and_validate(self):
         self._find_until_then_path()
@@ -86,12 +92,14 @@ class SelectGamePathPage(BasePage):
         selected_path_dialog.setNameFilter("UntilThen.exe")
         selected_path_dialog.exec()
 
-        selected_path = selected_path_dialog.selectedFiles()[0]
+        selected_files = selected_path_dialog.selectedFiles()
+        selected_path = selected_files[0] if selected_files else None
 
         if selected_path:
             self.path_label.setText(selected_path)
             self.controller.state.game_path = Path(selected_path).parent
-        self._validate_path()
+
+        self.file_not_selected_message.exec()
 
     def _validate_path(self):
         game_path = self.controller.state.game_path
