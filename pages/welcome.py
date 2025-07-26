@@ -1,8 +1,7 @@
 import gettext
 
 import qtawesome
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout, QFrame
 
 from pages.base import BasePage
@@ -13,7 +12,7 @@ LOG_PREFIX = "WelcomePage:"
 
 class WelcomePage(BasePage):
     def __init__(self, parent, controller):
-        super().__init__(parent, controller, window_title=_("Welcome"))
+        super().__init__(parent, controller)
 
         self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
         self._build_ui()
