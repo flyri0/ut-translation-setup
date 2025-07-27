@@ -44,6 +44,7 @@ class UnzipFilesPage(BasePage):
         self.unzip_button = QPushButton()
         self.unzip_button.setText(_("Descompactar arquivos"))
         self.unzip_button.setIcon(qtawesome.icon("fa6s.file-zipper"))
+        self.unzip_button.setDefault(True)
         self.unzip_button.clicked.connect(self._unzip_files)
 
         layout.addWidget(self.status_label)
