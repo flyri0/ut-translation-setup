@@ -3,8 +3,10 @@ import io
 import zipfile
 from pathlib import Path
 
+import qtawesome
 from PySide6.QtCore import Qt, QObject, Signal, QFile, QThread, Slot
-from PySide6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QPlainTextEdit, QSizePolicy
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QPlainTextEdit, QSizePolicy, QPushButton
 
 from pages.base import BasePage
 
@@ -22,27 +24,32 @@ class UnzipFilesPage(BasePage):
     def showEvent(self, event):
         super().showEvent(event)
 
-        self._unzip_files()
+        self.controller.back_button.setVisible(False)
+        self.controller.next_button.setEnabled(False)
 
     def _build_ui(self):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.progressbar = QProgressBar()
-        self.progressbar.setRange(0, 0)
         self.progressbar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.progressbar.setTextVisible(False)
 
         self.status_label = QLabel()
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.status_label.setText("Descompactando Arquivos...")
 
         self.log_frame = LogFrame()
         self.log_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
+        self.unzip_button = QPushButton()
+        self.unzip_button.setText(_("Descompactar arquivos"))
+        self.unzip_button.setIcon(qtawesome.icon("fa6s.file-zipper"))
+        self.unzip_button.clicked.connect(self._unzip_files)
+
         layout.addWidget(self.status_label)
         layout.addWidget(self.progressbar)
         layout.addWidget(self.log_frame)
+        layout.addWidget(self.unzip_button)
 
     def _unzip_files(self):
         self.unzip_thread = QThread(self)
@@ -81,6 +88,8 @@ class UnzipFilesPage(BasePage):
         if success:
             self.controller.logger.debug(f"{LOG_PREFIX} Successfully unzipped {message}")
             self.status_label.setText(_("Descompressão concluída!"))
+            self.controller.next_button.setEnabled(True)
+            self.unzip_button.setEnabled(False)
             return
         else:
             self.controller.logger.critical(f"{LOG_PREFIX} Failed to unzip {message}")
