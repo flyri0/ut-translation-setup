@@ -2,5 +2,6 @@
 <qresource>
     <file>assets/icon.ico</file>
     <file>assets/banner.png</file>
+    <file>assets/translation_files.zip</file>
 </qresource>
 </RCC>

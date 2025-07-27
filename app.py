@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget,
 from screeninfo import get_monitors
 
 from logger import _Logger
-from pages.fetch_translation_files import FetchTranslationFilesPage
+from pages.unzip_files import UnzipFilesPage
 from pages.select_game_path import SelectGamePathPage
 from pages.welcome import WelcomePage
 from state import AppState
@@ -26,7 +26,7 @@ class App(QMainWindow):
         self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Initialized")
 
-        self.page_sequence = [WelcomePage, SelectGamePathPage, FetchTranslationFilesPage]
+        self.page_sequence = [WelcomePage, SelectGamePathPage, UnzipFilesPage]
         self.current_index: int = 0
 
         self._build_ui()

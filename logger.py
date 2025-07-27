@@ -15,6 +15,7 @@ class _Logger:
             cls._logger = logging.getLogger("_Logger")
             cls._logger.setLevel(logging.DEBUG)
 
+            # TODO: detect nuitka binary
             base_path = pathlib.Path(sys.executable).parent if getattr(sys, 'frozen', False) else pathlib.Path(__file__).parent
             log_dir = base_path / "logs"
             log_dir.mkdir(parents=True, exist_ok=True)
