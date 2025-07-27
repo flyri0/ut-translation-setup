@@ -13,7 +13,7 @@ LOG_PREFIX = "App:"
 if __name__ == "__main__":
     logger = _Logger.get_logger()
     try:
-        app = QApplication([])
+        app = QApplication(sys.argv)
         main_window = App()
         main_window.show()
         sys.exit(app.exec())
