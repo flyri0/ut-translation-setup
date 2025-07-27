@@ -5,7 +5,6 @@ from pathlib import Path
 
 import qtawesome
 from PySide6.QtCore import Qt, QObject, Signal, QFile, QThread, Slot
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QPlainTextEdit, QSizePolicy, QPushButton
 
 from pages.base import BasePage
