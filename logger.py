@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import sys
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication
