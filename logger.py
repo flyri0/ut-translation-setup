@@ -1,13 +1,16 @@
 import logging
 import pathlib
 import sys
-from datetime import datetime
 from typing import Optional
-
 
 class _Logger:
     _logger: Optional[logging.Logger] = None
     _log_file_path: Optional[pathlib.Path] = None
+
+    @classmethod
+    def is_nuitka(cls) -> bool:
+        # Nuitka‑compiled modules define __compiled__ attribute
+        return getattr(sys.modules.get(__name__), "__compiled__", False)
 
     @classmethod
     def get_logger(cls) -> logging.Logger:
@@ -15,15 +18,20 @@ class _Logger:
             cls._logger = logging.getLogger("_Logger")
             cls._logger.setLevel(logging.DEBUG)
 
-            # TODO: detect nuitka binary
-            base_path = pathlib.Path(sys.executable).parent if getattr(sys, 'frozen', False) else pathlib.Path(__file__).parent
+            # detect frozen or Nuitka
+            if getattr(sys, "frozen", False) or cls.is_nuitka():
+                base_path = pathlib.Path(sys.executable).parent
+            else:
+                base_path = pathlib.Path(__file__).parent
+
             log_dir = base_path / "logs"
             log_dir.mkdir(parents=True, exist_ok=True)
 
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            cls._log_file_path = log_dir / f"ut_translation_installer-{timestamp}.log"
+            cls._log_file_path = log_dir / "ut_translation_installer.log"
 
-            file_handler = logging.FileHandler(cls._log_file_path, encoding="utf-8")
+            cls._logger.handlers.clear()
+
+            file_handler = logging.FileHandler(cls._log_file_path, encoding="utf‑8")
             stream_handler = logging.StreamHandler()
 
             file_handler.setLevel(logging.DEBUG)
@@ -31,7 +39,7 @@ class _Logger:
 
             formatter = logging.Formatter(
                 fmt="%(asctime)s - %(levelname)s - %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
+                datefmt="%Y‑%m‑%d %H:%M:%S",
             )
 
             file_handler.setFormatter(formatter)
