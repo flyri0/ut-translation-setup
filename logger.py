@@ -3,14 +3,12 @@ import pathlib
 import sys
 from typing import Optional
 
+from PySide6.QtCore import QCoreApplication
+
+
 class _Logger:
     _logger: Optional[logging.Logger] = None
     _log_file_path: Optional[pathlib.Path] = None
-
-    @classmethod
-    def is_nuitka(cls) -> bool:
-        # Nuitka‑compiled modules define __compiled__ attribute
-        return getattr(sys.modules.get(__name__), "__compiled__", False)
 
     @classmethod
     def get_logger(cls) -> logging.Logger:
@@ -18,13 +16,7 @@ class _Logger:
             cls._logger = logging.getLogger("_Logger")
             cls._logger.setLevel(logging.DEBUG)
 
-            # detect frozen or Nuitka
-            if getattr(sys, "frozen", False) or cls.is_nuitka():
-                base_path = pathlib.Path(sys.executable).parent
-            else:
-                base_path = pathlib.Path(__file__).parent
-
-            log_dir = base_path / "logs"
+            log_dir = pathlib.Path(QCoreApplication.applicationDirPath())
             log_dir.mkdir(parents=True, exist_ok=True)
 
             cls._log_file_path = log_dir / "ut_translation_installer.log"
