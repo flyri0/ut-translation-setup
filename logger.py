@@ -15,10 +15,12 @@ class _Logger:
             cls._logger = logging.getLogger("_Logger")
             cls._logger.setLevel(logging.DEBUG)
 
-            log_dir = pathlib.Path(QCoreApplication.applicationDirPath())
+            log_dir = pathlib.Path(QCoreApplication.applicationDirPath()) / "logs"
             log_dir.mkdir(parents=True, exist_ok=True)
-
             cls._log_file_path = log_dir / "ut_translation_installer.log"
+
+            if cls._log_file_path.exists():
+                cls._log_file_path.unlink()
 
             cls._logger.handlers.clear()
 
