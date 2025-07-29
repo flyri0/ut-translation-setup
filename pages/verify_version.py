@@ -24,6 +24,7 @@ class VerifyVersionPage(BasePage):
         self.worker.moveToThread(self.thread)
 
         self.worker.started.connect(self._on_worker_started)
+        self.worker.status.connect(self._on_status)
         self.worker.no_internet.connect(self._handle_no_internet)
         self.worker.error.connect(self._on_error)
         self.worker.update_available.connect(self._handle_update_available)
@@ -39,6 +40,7 @@ class VerifyVersionPage(BasePage):
         self.controller.logger.debug(f"{LOG_PREFIX} Building UI components")
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.setContentsMargins(30, 0, 30, 0)
 
         self.status = QLabel()
         self.status.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -79,7 +81,10 @@ class VerifyVersionPage(BasePage):
 
     def _on_worker_started(self):
         self.controller.logger.debug(f"{LOG_PREFIX} Worker started: checking internet")
-        self.status.setText(_("Verificando versão da tradução..."))
+
+    def _on_status(self, text: str):
+        self.controller.logger.debug(f"{LOG_PREFIX} Status changed to: {text}")
+        self.status.setText(text)
 
     def _handle_no_internet(self):
         self.controller.logger.warning(f"{LOG_PREFIX} No internet detected")
@@ -121,6 +126,7 @@ class VerifyVersionPage(BasePage):
 
 class VerifyVersionWorker(QObject):
     started = Signal()
+    status = Signal(str)
     no_internet = Signal()
     up_to_date = Signal()
     update_available = Signal(str, str)
@@ -133,11 +139,12 @@ class VerifyVersionWorker(QObject):
 
     def run(self):
         self.started.emit()
+        self.status.emit(_("Verificando conexão..."))
         if not self.is_connected():
             self.no_internet.emit()
             self.finished.emit()
             return
-        self.started.emit()
+        self.status.emit(_("Verificando versão..."))
 
         try:
             repo = Github().get_repo(REPO_ID)
