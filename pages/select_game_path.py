@@ -23,11 +23,12 @@ LOG_PREFIX = "SelectGamePathPage:"
 class SelectGamePathPage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
-
-        self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
+        self.controller.logger.debug(f"{LOG_PREFIX} Initialized page")
         self._build_ui()
+        self.controller.logger.debug(f"{LOG_PREFIX} UI built")
 
     def _build_ui(self):
+        self.controller.logger.debug(f"{LOG_PREFIX} Building UI elements")
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -70,54 +71,65 @@ class SelectGamePathPage(BasePage):
 
         self.exe_not_found_message = QMessageBox(parent=self.controller)
         self.exe_not_found_message.setWindowTitle(_("Executável não encontrado"))
-        self.exe_not_found_message.setText(_("Não foi possível localizar o arquivo “UntilThen.exe” automaticamente"
-                                             "\nPor favor, selecione o executável do jogo manualmente."))
+        self.exe_not_found_message.setText(_(
+            "Não foi possível localizar o arquivo “UntilThen.exe” automaticamente"
+            "\nPor favor, selecione o executável do jogo manualmente."
+        ))
         self.exe_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.exe_not_found_message.setStandardButtons(QMessageBox.StandardButton.Ok)
 
         self.file_not_selected_message = QMessageBox(parent=self.controller)
         self.file_not_selected_message.setWindowTitle(_("Nenhum arquivo selecionado"))
-        self.file_not_selected_message.setText("Você não selecionou um executável válido\nPor favor, tente novamente.")
+        self.file_not_selected_message.setText(_(
+            "Você não selecionou um executável válido\nPor favor, tente novamente."
+        ))
         self.file_not_selected_message.setIcon(QMessageBox.Icon.Information)
         self.file_not_selected_message.setStandardButtons(QMessageBox.StandardButton.Ok)
+        self.controller.logger.debug(f"{LOG_PREFIX} Dialogs initialized")
 
     def _find_and_validate(self):
+        self.controller.logger.debug(f"{LOG_PREFIX} Starting auto-find and validate sequence")
         self._find_until_then_path()
         self._validate_path()
 
     def showEvent(self, event):
         super().showEvent(event)
-
+        self.controller.logger.debug(f"{LOG_PREFIX} showEvent: disabling next until valid")
         self.controller.next_button.setEnabled(False)
         self.controller.back_button.setEnabled(True)
 
     def _handle_select(self):
+        self.controller.logger.debug(f"{LOG_PREFIX} Opening file dialog for manual selection")
         self.select_path_dialog.exec()
 
         selected_files = self.select_path_dialog.selectedFiles()
         selected_path = selected_files[0] if selected_files else None
+        self.controller.logger.debug(f"{LOG_PREFIX} User selected: {selected_path}")
 
         if selected_path:
             self.path_label.setText(selected_path)
             self.controller.state.game_path = Path(selected_path).parent
+            self.controller.logger.info(f"{LOG_PREFIX} Manual path set to {self.controller.state.game_path}")
             self._validate_path()
             return
 
+        self.controller.logger.info(f"{LOG_PREFIX} No file selected by user")
         self.file_not_selected_message.exec()
 
     def _validate_path(self):
         game_path = self.controller.state.game_path
         exe_path = game_path / GAME_EXE_NAME if game_path else None
+        self.controller.logger.debug(f"{LOG_PREFIX} Validating path: {exe_path}")
 
         if not exe_path or not exe_path.is_file():
-            self.controller.logger.warning(f"{LOG_PREFIX} Valid Until Then executable not found")
+            self.controller.logger.warning(f"{LOG_PREFIX} Valid UntilThen.exe not found at {exe_path}")
             self.status_label.setText(_("UntilThen.exe não encontrado"))
             self.status_label.setStyleSheet("color: #fb2c36")
             self.controller.next_button.setEnabled(False)
             self.search_button.setEnabled(True)
             self.exe_not_found_message.exec()
         else:
-            self.controller.logger.info(f"{LOG_PREFIX} Valid Until Then executable found at {exe_path}")
+            self.controller.logger.info(f"{LOG_PREFIX} Valid UntilThen.exe found at {exe_path}")
             self.path_label.setText(str(exe_path))
             self.status_label.setText(_("UntilThen.exe encontrado"))
             self.status_label.setStyleSheet("color: #00c951")
@@ -125,18 +137,21 @@ class SelectGamePathPage(BasePage):
             self.search_button.setEnabled(False)
 
     def _find_until_then_path(self):
+        self.controller.logger.debug(f"{LOG_PREFIX} Auto-detect path sequence started")
         if self.controller.state.game_path is not None:
+            self.controller.logger.debug(f"{LOG_PREFIX} Game path already set: {self.controller.state.game_path}, skipping detection")
             return
 
         for game_id in [FULL_GAME_ID, DEMO_GAME_ID]:
             path = self._find_game_path_by_id(game_id)
             if path is not None:
-                self.controller.logger.info(f"{LOG_PREFIX} The {"full" if game_id==FULL_GAME_ID else "demo" } version of Until Then was found")
+                ver = "full" if game_id == FULL_GAME_ID else "demo"
+                self.controller.logger.info(f"{LOG_PREFIX} The {ver} version of UntilThen was found at {path}")
                 self.controller.state.game_path = path
                 self.controller.state.is_demo = (game_id == DEMO_GAME_ID)
                 return
 
-        self.controller.logger.info(f"{LOG_PREFIX} No game installation found")
+        self.controller.logger.info(f"{LOG_PREFIX} No game installation found after detection attempts")
         self.controller.state.game_path = None
 
     def _find_game_path_by_id(self, game_id: int):
@@ -151,7 +166,7 @@ class SelectGamePathPage(BasePage):
             with open(library_folders_path, encoding="utf-8") as file:
                 library_data = vdf.load(file)
         except FileNotFoundError:
-            self.controller.logger.warning(f"{LOG_PREFIX} libraryfolders.vdf not found")
+            self.controller.logger.warning(f"{LOG_PREFIX} libraryfolders.vdf not found at {library_folders_path}")
             return None
 
         libraries = []
@@ -172,9 +187,9 @@ class SelectGamePathPage(BasePage):
                     with open(manifest_path, encoding="utf-8") as file:
                         manifest = vdf.load(file)
                     install_dir = manifest["AppState"]["installdir"]
-                    game_path = library_path / "steamapps" / "common"/ install_dir
+                    game_path = library_path / "steamapps" / "common" / install_dir
                     if game_path.exists():
-                        self.controller.logger.debug(f"{LOG_PREFIX} Found game at {game_path}")
+                        self.controller.logger.debug(f"{LOG_PREFIX} Found game directory at {game_path}")
                         return game_path.resolve()
                 except Exception as error:
                     self.controller.logger.warning(f"{LOG_PREFIX} Failed to parse manifest: {error}")
@@ -183,7 +198,7 @@ class SelectGamePathPage(BasePage):
         return None
 
     def _find_steam_path(self):
-        self.controller.logger.debug(f"{LOG_PREFIX} Trying to find steam path")
+        self.controller.logger.debug(f"{LOG_PREFIX} Trying to find steam installation path")
 
         system = platform.system()
         possible_paths = []
@@ -195,16 +210,15 @@ class SelectGamePathPage(BasePage):
                     steam_path = winreg.QueryValueEx(steam_key, "SteamPath")
                     winreg.CloseKey(steam_key)
                 except FileNotFoundError:
-                    self.controller.logger.warning(f"{LOG_PREFIX} Steam path not found in winreg")
+                    self.controller.logger.warning(f"{LOG_PREFIX} Steam path not found in registry")
                     steam_path = None
 
                 if steam_path:
                     possible_paths.append(Path(steam_path[0]))
-
-                possible_paths = [
-                    Path(os.environ.get("ProgramFiles(x86)")) / "Steam",
+                possible_paths.extend([
+                    Path(os.environ.get("ProgramFiles(x86)", "")) / "Steam",
                     Path(os.environ.get("ProgramFiles", "")) / "Steam",
-                ]
+                ])
             case "Linux":
                 possible_paths = [
                     Path().home() / ".steam" / "steam",
@@ -220,5 +234,5 @@ class SelectGamePathPage(BasePage):
                 self.controller.logger.debug(f"{LOG_PREFIX} Steam path found at {path}")
                 return path.resolve()
 
-        self.controller.logger.info(f"{LOG_PREFIX} Steam not found in standard directories")
+        self.controller.logger.info(f"{LOG_PREFIX} Steam not found in standard directories: {possible_paths}")
         return None

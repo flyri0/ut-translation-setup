@@ -10,6 +10,7 @@ class AppState:
     game_path: Optional[Path] = None
     is_demo: Optional[bool] = None
     _temp_dir: Path = field(init=False, repr=False)
+    _installer_version: Optional[str] = None
 
     def __post_init__(self):
         self._qtemp_dir = QTemporaryDir()
@@ -17,7 +18,12 @@ class AppState:
             raise RuntimeError("Failed to create temporary directory")
 
         self._temp_dir = Path(self._qtemp_dir.path())
+        self._installer_version = "0.0.1" # this must be a valid semver string
 
     @property
     def temp_dir(self) -> Path:
         return self._temp_dir
+
+    @property
+    def installer_version(self):
+        return self._installer_version

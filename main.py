@@ -19,7 +19,6 @@ def excepthook(exc_type, exc_value, exc_tb):
     messagebox.setWindowTitle(_("Erro Inesperado"))
     messagebox.setText(_("Um arquivo de log foi criado."))
     messagebox.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Open)
-    messagebox.setButtonText(QMessageBox.StandardButton.Open, _("Abrir"))
     messagebox.setDefaultButton(QMessageBox.StandardButton.Open)
     QApplication.beep()
     result = messagebox.exec()

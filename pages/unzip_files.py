@@ -16,17 +16,18 @@ LOG_PREFIX = "UnzipFilesPage:"
 class UnzipFilesPage(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
-
-        self.controller.logger.debug(f"{LOG_PREFIX} Loaded")
+        self.controller.logger.debug(f"{LOG_PREFIX} Initialized page")
         self._build_ui()
+        self.controller.logger.debug(f"{LOG_PREFIX} UI built")
 
     def showEvent(self, event):
         super().showEvent(event)
-
+        self.controller.logger.debug(f"{LOG_PREFIX} showEvent: hiding back button and disabling next")
         self.controller.back_button.setVisible(False)
         self.controller.next_button.setEnabled(False)
 
     def _build_ui(self):
+        self.controller.logger.debug(f"{LOG_PREFIX} Building UI components")
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -50,8 +51,10 @@ class UnzipFilesPage(BasePage):
         layout.addWidget(self.progressbar)
         layout.addWidget(self.log_frame)
         layout.addWidget(self.unzip_button)
+        self.controller.logger.debug(f"{LOG_PREFIX} UI layout complete")
 
     def _unzip_files(self):
+        self.controller.logger.info(f"{LOG_PREFIX} Starting unzip worker thread")
         self.unzip_thread = QThread(self)
         self.unzip_worker = UnzipWorker(
             QFile(":/assets/translation_files.zip"),
@@ -72,11 +75,13 @@ class UnzipFilesPage(BasePage):
         self.unzip_thread.start()
 
     def _on_total_files(self, total):
+        self.controller.logger.debug(f"{LOG_PREFIX} Total files to extract: {total}")
         self.status_label.setText(_("Descompactando 0 de {total} arquivos...").format(total=total))
         self.progressbar.setRange(0, total)
         self.progressbar.setValue(0)
 
     def _on_extracted(self, count, file_name):
+        self.controller.logger.debug(f"{LOG_PREFIX} Extracted {file_name} ({count}/{self.progressbar.maximum()})")
         self.progressbar.setValue(count)
         self.log_frame.append_message(file_name)
         self.status_label.setText(_("Descompactando {count}/{total}").format(
@@ -86,13 +91,12 @@ class UnzipFilesPage(BasePage):
 
     def _on_unzip_finished(self, success, message):
         if success:
-            self.controller.logger.debug(f"{LOG_PREFIX} Successfully unzipped {message}")
+            self.controller.logger.info(f"{LOG_PREFIX} Unzip completed, files extracted to {message}")
             self.status_label.setText(_("Descompressão concluída!"))
             self.controller.next_button.setEnabled(True)
             self.unzip_button.setEnabled(False)
-            return
         else:
-            self.controller.logger.critical(f"{LOG_PREFIX} Failed to unzip {message}")
+            self.controller.logger.critical(f"{LOG_PREFIX} Unzip failed: {message}")
             raise RuntimeError(message)
 
 class LogFrame(QPlainTextEdit):
@@ -101,6 +105,7 @@ class LogFrame(QPlainTextEdit):
 
         self.setReadOnly(True)
         self.viewport().setCursor(Qt.CursorShape.ArrowCursor)
+        self.controller_logger = None
 
     def append_message(self, message: str):
         self.appendPlainText(message)
@@ -115,7 +120,6 @@ class UnzipWorker(QObject):
 
     def __init__(self, file: QFile, dest_dir: Path):
         super().__init__()
-
         self.file = file
         self.dest_dir = dest_dir.absolute().resolve()
 
