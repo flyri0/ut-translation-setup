@@ -9,7 +9,6 @@ from pages.base import BasePage
 
 _ = gettext.gettext
 LOG_PREFIX = "VerifyVersionPage:"
-REPO_ID = 1014041717
 
 class VerifyVersionPage(BasePage):
     def __init__(self, parent, controller):
@@ -20,7 +19,10 @@ class VerifyVersionPage(BasePage):
 
         self.controller.logger.debug(f"{LOG_PREFIX} Setting up worker thread")
         self.thread = QThread(self)
-        self.worker = VerifyVersionWorker(self.controller.state.installer_version)
+        self.worker = VerifyVersionWorker(
+            self.controller.state.installer_version,
+            self.controller.state.github_repo_id,
+        )
         self.worker.moveToThread(self.thread)
 
         self.worker.started.connect(self._on_worker_started)
@@ -133,9 +135,10 @@ class VerifyVersionWorker(QObject):
     error = Signal()
     finished = Signal()
 
-    def __init__(self, local_version: str, parent=None):
+    def __init__(self, local_version: str, repo_id: int, parent=None):
         super().__init__(parent)
         self.local_version = local_version
+        self.repo_id = repo_id
 
     def run(self):
         self.started.emit()
@@ -147,9 +150,9 @@ class VerifyVersionWorker(QObject):
         self.status.emit(_("Verificando versão..."))
 
         try:
-            repo = Github().get_repo(REPO_ID)
+            repo = Github().get_repo(self.repo_id)
             latest_tag = repo.get_latest_release().tag_name
-        except GithubException as e:
+        except GithubException:
             self.error.emit()
             self.finished.emit()
             return
