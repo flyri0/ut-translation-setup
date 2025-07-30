@@ -1,9 +1,9 @@
 import gettext
 import sys
 
-from PySide6.QtCore import QUrl
-from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtCore import QUrl, QObject, QEvent
+from PySide6.QtGui import QDesktopServices, Qt
+from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton
 from app import App
 from logger import _Logger
 
@@ -32,10 +32,24 @@ def excepthook(exc_type, exc_value, exc_tb):
 
 sys.excepthook = excepthook
 
+class ButtonDisableFilter(QObject):
+    """
+    This filter prevents the hover effect freeze after a QPushButton is set to disable.
+    """
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.EnabledChange:
+            if isinstance(obj, QPushButton) and not obj.isEnabled():
+                obj.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, False)
+                obj.style().unpolish(obj)
+                obj.style().polish(obj)
+        return super().eventFilter(obj, event)
+
+
 if __name__ == "__main__":
     logger = _Logger.get_logger()
     try:
         app = QApplication(sys.argv)
+        app.installEventFilter(ButtonDisableFilter(app))
         main_window = App()
         main_window.show()
         sys.exit(app.exec())

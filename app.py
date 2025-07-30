@@ -1,7 +1,7 @@
 import gettext
 
 import qtawesome
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QObject, QEvent
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QFrame,
@@ -20,6 +20,7 @@ import assets  # type: ignore
 
 _ = gettext.gettext
 LOG_PREFIX = "App:"
+
 
 class App(QMainWindow):
     def __init__(self):
