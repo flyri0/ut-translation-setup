@@ -11,7 +11,7 @@ from screeninfo import get_monitors
 
 from logger import _Logger
 from pages.unzip_files import UnzipFilesPage
-from pages.select_game_path import SelectGamePathPage
+from pages.find_game_path import FindGamePath
 from pages.verify_version import VerifyVersionPage
 from pages.welcome import WelcomePage
 from state import AppState
@@ -29,7 +29,7 @@ class App(QMainWindow):
         self.logger = _Logger.get_logger()
         self.logger.info(f"{LOG_PREFIX} Application initialized")
 
-        self.page_sequence = [VerifyVersionPage, WelcomePage, SelectGamePathPage, UnzipFilesPage]
+        self.page_sequence = [VerifyVersionPage, WelcomePage, FindGamePath, UnzipFilesPage]
         self.current_index = 0
 
         self.logger.debug(f"{LOG_PREFIX} Building UI")

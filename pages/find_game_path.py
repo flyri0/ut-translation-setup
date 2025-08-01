@@ -1,7 +1,6 @@
 import gettext
 import os
 import platform
-import winreg
 from pathlib import Path
 
 import qtawesome
@@ -18,9 +17,9 @@ _ = gettext.gettext
 FULL_GAME_ID = 1574820
 DEMO_GAME_ID = 2296400
 GAME_EXE_NAME = "UntilThen.exe"
-LOG_PREFIX = "SelectGamePathPage:"
+LOG_PREFIX = "FindGamePath:"
 
-class SelectGamePathPage(BasePage):
+class FindGamePath(BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         self.controller.logger.debug(f"{LOG_PREFIX} Initialized page")
@@ -49,7 +48,7 @@ class SelectGamePathPage(BasePage):
         self.select_button.clicked.connect(self._handle_select)
         self.select_button.setIcon(qtawesome.icon("fa6s.folder-open"))
 
-        self.search_button = QPushButton(_("Encontrar Automaticamente"))
+        self.search_button = QPushButton(_("Busca Rápida"))
         self.search_button.clicked.connect(self._find_and_validate)
         self.search_button.setIcon(qtawesome.icon("fa6s.magnifying-glass"))
         self.search_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -205,6 +204,8 @@ class SelectGamePathPage(BasePage):
 
         match system:
             case "Windows":
+                import winreg
+
                 try:
                     steam_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
                     steam_path = winreg.QueryValueEx(steam_key, "SteamPath")
@@ -223,7 +224,10 @@ class SelectGamePathPage(BasePage):
                 possible_paths = [
                     Path().home() / ".steam" / "steam",
                     Path().home() / ".local" / "share" / "Steam",
+                    Path().home() / ".local" / "share" / "Steam" / "steamapps",
+                    Path().home() / "snap" / "steam" / "common" / ".local" / "share" / "Steam" / "steamapps",
                     Path().home() / ".var" / "app" / "com.valvesoftware.Steam" / "data" / "Steam",
+
                 ]
             case _:
                 self.controller.logger.warning(f"{LOG_PREFIX} Unsupported system: {system}")
