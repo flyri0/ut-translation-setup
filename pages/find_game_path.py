@@ -152,12 +152,6 @@ class FindGamePath(BasePage):
     def _find_until_then_path(self):
         self.controller.logger.debug(f"{LOG_PREFIX} Auto-detect path sequence started")
 
-        if self.controller.state.game_path is not None:
-            self.controller.logger.debug(
-                f"{LOG_PREFIX} Game path already set: {self.controller.state.game_path}, skipping detection"
-            )
-            return
-
         exe_names = ("UntilThen.exe", "UntilThen.x86_64")
 
         for game_id in (FULL_GAME_ID, DEMO_GAME_ID):
@@ -252,8 +246,8 @@ class FindGamePath(BasePage):
                 possible_paths = [
                     Path().home() / ".steam" / "steam",
                     Path().home() / ".local" / "share" / "Steam",
-                    Path().home() / ".local" / "share" / "Steam" / "steamapps",
-                    Path().home() / "snap" / "steam" / "common" / ".local" / "share" / "Steam" / "steamapps",
+                    Path().home() / ".local" / "share" / "Steam",
+                    Path().home() / "snap" / "steam" / "common" / ".local" / "share" / "Steam",
                     Path().home() / ".var" / "app" / "com.valvesoftware.Steam" / "data" / "Steam",
 
                 ]
