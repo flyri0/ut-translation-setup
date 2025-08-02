@@ -148,6 +148,7 @@ class FindGamePath(BasePage):
         self.status_label.setStyleSheet("color: #00c951")
         self.controller.next_button.setEnabled(True)
         self.search_button.setEnabled(False)
+        self.select_button.setEnabled(False)
 
     def _find_until_then_path(self):
         self.controller.logger.debug(f"{LOG_PREFIX} Auto-detect path sequence started")
