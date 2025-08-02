@@ -5,6 +5,7 @@ from pathlib import Path
 
 import qtawesome
 import vdf
+from PySide6.QtCore import QDir
 
 from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QGroupBox, QHBoxLayout, QSizePolicy, QPushButton, QFrame, \
@@ -16,7 +17,6 @@ _ = gettext.gettext
 
 FULL_GAME_ID = 1574820
 DEMO_GAME_ID = 2296400
-GAME_EXE_NAME = "UntilThen.exe"
 LOG_PREFIX = "FindGamePath:"
 
 class FindGamePath(BasePage):
@@ -64,8 +64,9 @@ class FindGamePath(BasePage):
         main_layout.addWidget(self.status_label)
 
         self.select_path_dialog = QFileDialog(parent=self.controller)
-        self.select_path_dialog.setWindowTitle(_("Selecionar UntilThen.exe"))
-        self.select_path_dialog.setNameFilter("UntilThen.exe")
+        self.select_path_dialog.setWindowTitle(_("Selecionar Executável"))
+        self.select_path_dialog.setFilter(QDir.Filter.Files)
+        self.select_path_dialog.setNameFilter("UntilThen.exe UntilThen.x86_64")
         self.select_path_dialog.setDirectory(str(Path.home().absolute().resolve()))
 
         self.exe_not_found_message = QMessageBox(parent=self.controller)
@@ -107,7 +108,7 @@ class FindGamePath(BasePage):
 
         if selected_path:
             self.path_label.setText(selected_path)
-            self.controller.state.game_path = Path(selected_path).parent
+            self.controller.state.game_path = Path(selected_path)
             self.controller.logger.info(f"{LOG_PREFIX} Manual path set to {self.controller.state.game_path}")
             self._validate_path()
             return
@@ -117,41 +118,68 @@ class FindGamePath(BasePage):
 
     def _validate_path(self):
         game_path = self.controller.state.game_path
-        exe_path = game_path / GAME_EXE_NAME if game_path else None
-        self.controller.logger.debug(f"{LOG_PREFIX} Validating path: {exe_path}")
 
-        if not exe_path or not exe_path.is_file():
-            self.controller.logger.warning(f"{LOG_PREFIX} Valid UntilThen.exe not found at {exe_path}")
-            self.status_label.setText(_("UntilThen.exe não encontrado"))
-            self.status_label.setStyleSheet("color: #fb2c36")
-            self.controller.next_button.setEnabled(False)
-            self.search_button.setEnabled(True)
-            self.exe_not_found_message.exec()
+        if not game_path:
+            self.controller.logger.warning(f"{LOG_PREFIX} No game path set")
+            self._report_missing_pck()
+            return
+
+        pck_path = Path(game_path).parent / "UntilThen.pck"
+        self.controller.logger.debug(f"{LOG_PREFIX} Validating PCK file at: {pck_path}")
+
+        if not pck_path.is_file():
+            self.controller.logger.warning(f"{LOG_PREFIX} UntilThen.pck not found at {pck_path}")
+            self._report_missing_pck()
+            return
         else:
-            self.controller.logger.info(f"{LOG_PREFIX} Valid UntilThen.exe found at {exe_path}")
-            self.path_label.setText(str(exe_path))
-            self.status_label.setText(_("UntilThen.exe encontrado"))
-            self.status_label.setStyleSheet("color: #00c951")
-            self.controller.next_button.setEnabled(True)
-            self.search_button.setEnabled(False)
+            self.controller.logger.info(f"{LOG_PREFIX} UntilThen.pck found at {pck_path}")
+            self._report_pck_found(game_path)
+
+    def _report_missing_pck(self):
+        self.status_label.setText(_("UntilThen.pck não encontrado"))
+        self.status_label.setStyleSheet("color: #fb2c36")
+        self.controller.next_button.setEnabled(False)
+        self.search_button.setEnabled(True)
+        self.exe_not_found_message.exec()
+
+    def _report_pck_found(self, game_path: Path):
+        self.path_label.setText(str(game_path.resolve()))
+        self.status_label.setText(_("UntilThen.pck encontrado"))
+        self.status_label.setStyleSheet("color: #00c951")
+        self.controller.next_button.setEnabled(True)
+        self.search_button.setEnabled(False)
 
     def _find_until_then_path(self):
         self.controller.logger.debug(f"{LOG_PREFIX} Auto-detect path sequence started")
+
         if self.controller.state.game_path is not None:
-            self.controller.logger.debug(f"{LOG_PREFIX} Game path already set: {self.controller.state.game_path}, skipping detection")
+            self.controller.logger.debug(
+                f"{LOG_PREFIX} Game path already set: {self.controller.state.game_path}, skipping detection"
+            )
             return
 
-        for game_id in [FULL_GAME_ID, DEMO_GAME_ID]:
-            path = self._find_game_path_by_id(game_id)
-            if path is not None:
-                ver = "full" if game_id == FULL_GAME_ID else "demo"
-                self.controller.logger.info(f"{LOG_PREFIX} The {ver} version of UntilThen was found at {path}")
-                self.controller.state.game_path = path
-                self.controller.state.is_demo = (game_id == DEMO_GAME_ID)
-                return
+        exe_names = ("UntilThen.exe", "UntilThen.x86_64")
 
-        self.controller.logger.info(f"{LOG_PREFIX} No game installation found after detection attempts")
-        self.controller.state.game_path = None
+        for game_id in (FULL_GAME_ID, DEMO_GAME_ID):
+            install_dir = self._find_game_path_by_id(game_id)
+            if install_dir is None:
+                continue
+
+            install_dir = Path(install_dir)
+            for exe_name in exe_names:
+                candidate = Path(install_dir / exe_name)
+                if candidate.is_file():
+                    ver = "full" if game_id == FULL_GAME_ID else "demo"
+                    abs_exe = candidate.resolve()
+                    self.controller.logger.info(
+                        f"{LOG_PREFIX} The {ver} version of UntilThen was found at {abs_exe}"
+                    )
+                    self.controller.state.game_path = abs_exe
+                    self.controller.state.is_demo = (game_id == DEMO_GAME_ID)
+                    return
+
+            self.controller.logger.info(f"{LOG_PREFIX} No game installation found after detection attempts")
+            self.controller.state.game_path = None
 
     def _find_game_path_by_id(self, game_id: int):
         self.controller.logger.debug(f"{LOG_PREFIX} Trying to auto-detect game path for ID {game_id}")
