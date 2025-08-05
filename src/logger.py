@@ -20,7 +20,7 @@ class Logger:
     def __init__(
             self,
             name: str = "setup",
-            level: int = logging.INFO,
+            level: int = logging.DEBUG,
     ):
         if getattr(self, "_initialized", False):
             return
