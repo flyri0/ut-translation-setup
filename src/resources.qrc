@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+    <file alias="banner">../resources/banner.png</file>
+    <file alias="icon">../resources/icon.ico</file>
+    <file alias="translation_files.zip">../resources/translation_files.zip</file>
+</qresource>
+</RCC>

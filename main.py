@@ -6,15 +6,12 @@ from src.app import App
 from src.logger import Logger
 
 if __name__ == "__main__":
-    logger = Logger.new()
+    logger = Logger().get_logger()
     try:
         app = QApplication(sys.argv)
 
         main_window = App()
         main_window.show()
-        logger.info("Initialized")
         sys.exit(app.exec())
     except Exception as error:
         logger.exception(error)
-    finally:
-        logger.info(f"Terminated")

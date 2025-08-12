@@ -55,7 +55,3 @@ class Logger:
 
     def get_logger(self):
         return self.logger
-
-    @classmethod
-    def new(cls, name: str = "setup", level: int = logging.INFO):
-        return cls(name=name, level=level).get_logger()
