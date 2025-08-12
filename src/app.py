@@ -100,15 +100,15 @@ class App(QMainWindow):
 
         self.cancel_button = QPushButton(
             qtawesome.icon("fa6s.xmark"),
-            self.tr("Cancelar")
+            self.tr("Cancel")
         )
         self.back_button = QPushButton(
             qtawesome.icon("fa6s.chevron-left"),
-            self.tr("Voltar")
+            self.tr("Back")
         )
         self.next_button = QPushButton(
             qtawesome.icon("fa6s.chevron-right"),
-            self.tr("Próximo")
+            self.tr("Next")
         )
 
         self.cancel_button.clicked.connect(self.close)
