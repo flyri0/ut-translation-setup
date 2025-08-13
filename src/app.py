@@ -216,7 +216,7 @@ class App(QMainWindow):
                 event.ignore()
 
     def _on_page_error(self, exc: Exception):
-        self.logger.error("Unhandled exception")
+        self.logger.exception(exc)
 
         log_path = Path(Logger().get_log_file_path())
 
@@ -241,7 +241,6 @@ class App(QMainWindow):
                 QDesktopServices.openUrl(QUrl.fromLocalFile(log_path))
 
         QApplication.exit(1)
-        raise exc
 
 
 class ScaledLabel(QLabel):
