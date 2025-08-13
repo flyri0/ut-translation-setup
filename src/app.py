@@ -42,7 +42,6 @@ class App(QMainWindow):
         self._show_page(0)
 
     def _build_ui(self):
-        self.logger.debug("Building UI...")
         central = QWidget()
         central.setStyleSheet("QPushButton { padding: 10px; }")
         self.setCentralWidget(central)
