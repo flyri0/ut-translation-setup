@@ -16,3 +16,7 @@ class BasePage(QWidget):
         super().__init__(parent)
         self.controller = controller
         self.logger = Logger().get_logger()
+        self._build_ui()
+
+    def _build_ui(self):
+        pass

@@ -1,3 +1,4 @@
+import atexit
 from pathlib import Path
 from typing import Type
 
@@ -14,12 +15,15 @@ from src.pages.find_game_path import FindGamePathPage
 from src.pages.install_files import InstallFilesPage
 from src.pages.verify_version import VerifyVersionPage
 from src.pages.welcome import WelcomePage
+from src.state import State
 
 
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.state = State()
+        atexit.register(self.state.cleanup)
         self.logger = Logger().get_logger()
 
         QResource.registerResource('src/resources.rcc')
