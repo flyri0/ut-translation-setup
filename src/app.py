@@ -189,6 +189,7 @@ class App(QMainWindow):
         else:
             center_point = self.frameGeometry().center()
 
+        self.setFixedSize(int(width), int(height))
         geometry = self.frameGeometry()
         geometry.moveCenter(center_point)
         self.move(geometry.topLeft())
