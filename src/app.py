@@ -182,7 +182,6 @@ class App(QMainWindow):
             width = int(height * target_ratio)
 
         self.setMinimumSize(600, 400)
-        self.resize(int(width), int(height))
 
         if screen_geometry is not None:
             center_point = screen_geometry.center()
