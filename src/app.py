@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Type
 
 import qtawesome
-from PySide6.QtCore import QResource, QSize, QUrl, QObject, QEvent
+from PySide6.QtCore import QResource, QSize, QUrl
 from PySide6.QtGui import QIcon, QPixmap, Qt, QGuiApplication, QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, \
     QStackedWidget, QHBoxLayout, QSizePolicy, QFrame, QPushButton, \
@@ -25,7 +25,6 @@ class App(QMainWindow):
         self.state = State()
         atexit.register(self.state.cleanup)
         self.logger = Logger().get_logger()
-        self.installEventFilter(ButtonDisableFilter(self))
 
         QResource.registerResource('src/resources.rcc')
         self.logger.info("Application Initialized")
@@ -245,16 +244,6 @@ class App(QMainWindow):
                 QDesktopServices.openUrl(QUrl.fromLocalFile(log_path))
 
         QApplication.exit(1)
-
-
-class ButtonDisableFilter(QObject):
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.EnabledChange:
-            if isinstance(obj, QPushButton) and not obj.isEnabled():
-                obj.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, False)
-                obj.style().unpolish(obj)
-                obj.style().polish(obj)
-        return super().eventFilter(obj, event)
 
 
 class ScaledLabel(QLabel):
