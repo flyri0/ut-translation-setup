@@ -170,8 +170,8 @@ class App(QMainWindow):
             screen_width, screen_height = 1280, 720
             screen_geometry = None
 
-        max_width = int(screen_width * 0.5)
-        max_height = int(screen_height * 0.5)
+        max_width = int(screen_width * 0.55)
+        max_height = int(screen_height * 0.55)
         target_ratio = 4 / 3
 
         width = max_width
@@ -187,7 +187,7 @@ class App(QMainWindow):
         else:
             center_point = self.frameGeometry().center()
 
-        self.setFixedSize(int(width), int(height))
+        self.resize(int(width), int(height))
         geometry = self.frameGeometry()
         geometry.moveCenter(center_point)
         self.move(geometry.topLeft())
