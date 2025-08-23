@@ -9,8 +9,9 @@ from dotenv import load_dotenv
 
 @dataclass
 class State:
-    game_path: Optional[Path] = None
+    pck_path: Optional[Path] = None
     is_demo: Optional[bool] = None
+    is_valid_file: bool = False
     _temp_dir: Path = field(init=False, repr=False)
     _temp_dir_mgr: Optional[tempfile.TemporaryDirectory] = field(init=False, repr=False, default=None)
     _installer_version: Optional[str] = field(init=False, repr=False, default=None)
