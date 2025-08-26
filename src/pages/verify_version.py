@@ -1,7 +1,9 @@
 import socket
+from time import sleep
 
+import qtawesome
 import semver
-from PySide6.QtCore import QThread, QObject, Signal, Qt, QTimer, QUrl
+from PySide6.QtCore import QThread, QObject, Signal, Qt, QTimer, QUrl, QSize
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QMessageBox, \
     QApplication
@@ -40,12 +42,18 @@ class VerifyVersionPage(BasePage):
         self.status = QLabel()
         self.status.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        progressbar = QProgressBar()
-        progressbar.setRange(0, 0)
-        progressbar.setTextVisible(False)
+        spinner_widget = qtawesome.IconWidget()
+        spinner_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        spinner_animation = qtawesome.Spin(spinner_widget)
+        spinner_icon = qtawesome.icon(
+            "fa6s.spinner",
+            animation=spinner_animation,
+        )
+        spinner_widget.setIconSize(QSize(32, 32))
+        spinner_widget.setIcon(spinner_icon)
 
         layout.addWidget(self.status)
-        layout.addWidget(progressbar)
+        layout.addWidget(spinner_widget)
 
         self.no_internet_msg = QMessageBox(parent=self.controller)
         self.no_internet_msg.setIcon(QMessageBox.Icon.Warning)
