@@ -107,6 +107,9 @@ class FindGamePathPage(BasePage):
             self.path_label.setText(selected_file)
             self.controller.state.pck_path = Path(selected_file)
             self._validate_file()
+            if Path(selected_file).parent.name == "Until Then Demo":
+                self.controller.state.is_demo = True
+
             return None
 
         self.controller.logger.debug("No file selected by user")
@@ -171,6 +174,9 @@ class FindGamePathPage(BasePage):
             candidate = install_dir / "UntilThen.pck"
             if candidate.is_file():
                 ver = "full" if game_id == self.FULL_GAME_ID else "demo"
+                if ver == "demo":
+                    self.controller.state.is_demo = True
+
                 abs_file_path = candidate.resolve()
                 self.controller.logger.debug(
                     "Found UntilThen.pck at"
