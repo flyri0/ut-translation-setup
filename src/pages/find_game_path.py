@@ -174,7 +174,7 @@ class FindGamePathPage(BasePage):
                 abs_file_path = candidate.resolve()
                 self.controller.logger.debug(
                     "Found UntilThen.pck at"
-                    f" {abs_file_path} (game version {ver})"
+                    f" {abs_file_path} (game version: {ver})"
                 )
                 self.controller.state.pck_path = abs_file_path
                 return None
