@@ -2,6 +2,7 @@
 <qresource prefix="">
     <file alias="banner">../resources/banner.png</file>
     <file alias="icon">../resources/icon.ico</file>
-    <file alias="translation_files.zip">../resources/translation_files.zip</file>
+    <file alias="translation_files_zip">../resources/translation_files.zip</file>
+    <file alias="pck_explorer_win">../resources/GodotPCKExplorer_1.5.3_native-console-win-64.zip</file>
 </qresource>
 </RCC>
