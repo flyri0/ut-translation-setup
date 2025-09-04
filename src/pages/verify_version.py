@@ -1,5 +1,4 @@
 import socket
-from time import sleep
 
 import qtawesome
 import semver
