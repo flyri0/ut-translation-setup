@@ -167,7 +167,7 @@ class FindGamePathPage(BasePage):
         self.controller.logger.debug("Trying to auto-detect game path")
 
         for game_id in [self.FULL_GAME_ID, self.DEMO_GAME_ID]:
-            install_dir = Path(self._find_game_path_by_id(game_id))
+            install_dir = self._find_game_path_by_id(game_id)
             if install_dir is None:
                 continue
 
@@ -235,7 +235,7 @@ class FindGamePathPage(BasePage):
                     if game_path.exists():
                         self.controller.logger.debug(
                             f"Found game directory at {game_path}")
-                        return game_path.resolve()
+                        return Path(game_path.resolve())
                 except Exception as error:
                     self.controller.logger.warning(
                         f"Failed to parse manifest: {error}")
