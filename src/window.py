@@ -1,3 +1,4 @@
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
 from src.pages.verify_version import VerifyVersionPage
@@ -8,13 +9,34 @@ class AppWindow(QMainWindow):
         super().__init__()
 
         self.config = config
+        screen_size = self.screen().availableGeometry()
+        self.resize(self._resize_with_ratio(screen_size.width(), screen_size.height(), (4, 3)))
 
         self.page_stack = QStackedWidget()
         self.verify_version_page = VerifyVersionPage(
             setup_version=config["setup_version"],
             repo_id=config["repository_id"]
         )
-
         self.page_stack.addWidget(self.verify_version_page)
 
         self.setCentralWidget(self.page_stack)
+
+    @staticmethod
+    def _resize_with_ratio(screen_width: int, screen_height: int, ratio: tuple[int, int], fraction: float = 0.5):
+        """
+        Resize to be as large as possible up to `fraction` of the given screen size,
+        while preserving the given aspect ratio (ratio[0]:ratio[1]).
+        Returns a QSize(width, height).
+        """
+
+        max_w = screen_width * fraction
+        max_h = screen_height * fraction
+
+        ratio_w, ratio_h = ratio
+        aspect = ratio_w / ratio_h
+
+        width, height = max_w, max_w / aspect
+        if height > max_h:
+            height, width = max_h, max_h * aspect
+
+        return QSize(int(round(width)), int(round(height)))
