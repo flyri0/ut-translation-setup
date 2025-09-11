@@ -3,7 +3,7 @@ import socket
 import semver
 from PySide6.QtCore import Signal, Qt, QTimer
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QMessageBox, QProgressBar, QApplication
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QMessageBox, QProgressBar
 from github import Github, GithubException
 
 
