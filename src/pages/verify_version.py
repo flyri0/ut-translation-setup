@@ -1,7 +1,7 @@
 import socket
 
 import semver
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal, Qt, QTimer
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QMessageBox, QProgressBar, QApplication
 from github import Github, GithubException
@@ -10,6 +10,7 @@ from github import Github, GithubException
 class VerifyVersionPage(QWidget):
     hide_controls = Signal()
     finished = Signal()
+    quit = Signal()
 
     def __init__(self, setup_version: str, repo_id: str):
         super().__init__()
@@ -80,7 +81,7 @@ class VerifyVersionPage(QWidget):
 
             if result == QMessageBox.StandardButton.Yes:
                 QDesktopServices.openUrl(url)
-                QApplication.quit()
+                QTimer.singleShot(0, self.quit.emit)  # emit after the current event loop interation
             else:
                 self.finished.emit()
                 return None
