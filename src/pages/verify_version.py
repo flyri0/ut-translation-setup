@@ -72,7 +72,6 @@ class VerifyVersionPage(QWidget):
             repo = Github().get_repo(self.repo_name)
             latest_tag = repo.get_latest_release().tag_name
         except GithubException as e:
-            print(e)
             self.finished.emit()
             return None
 
