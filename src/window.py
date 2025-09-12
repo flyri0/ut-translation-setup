@@ -12,7 +12,11 @@ class AppWindow(QMainWindow):
 
         self.config = config
         screen_size = self.screen().availableGeometry()
-        self.resize(self._resize_with_ratio(screen_size.width(), screen_size.height(), (4, 3)))
+        self.resize(self._resize_with_ratio(
+            screen_size.width(),
+            screen_size.height(),
+            (4, 3)
+        ))
 
         self.page_stack = QStackedWidget()
         self.verify_version_page = VerifyVersionPage(
@@ -24,10 +28,15 @@ class AppWindow(QMainWindow):
         self.setCentralWidget(self.page_stack)
 
     @staticmethod
-    def _resize_with_ratio(screen_width: int, screen_height: int, ratio: tuple[int, int], fraction: float = 0.5):
+    def _resize_with_ratio(
+            screen_width: int,
+            screen_height: int,
+            ratio: tuple[int, int],
+            fraction: float = 0.5
+    ):
         """
-        Resize to be as large as possible up to `fraction` of the given screen size,
-        while preserving the given aspect ratio (ratio[0]:ratio[1]).
+        Resize to be as large as possible up to `fraction` of the given screen
+        size, while preserving the given aspect ratio (ratio[0]:ratio[1]).
         Returns a QSize(width, height).
         """
 

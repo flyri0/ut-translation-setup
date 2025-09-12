@@ -3,7 +3,8 @@ import socket
 import semver
 from PySide6.QtCore import Signal, Qt, QTimer
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QMessageBox, QProgressBar
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QMessageBox, \
+    QProgressBar
 from github import Github, GithubException
 
 
@@ -36,7 +37,6 @@ class VerifyVersionPage(QWidget):
         progress_bar = QProgressBar()
         progress_bar.setRange(0, 0)
 
-
         layout.addWidget(self.status)
         layout.addWidget(progress_bar)
 
@@ -63,7 +63,8 @@ class VerifyVersionPage(QWidget):
         self.update_available_msg.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
-        self.update_available_msg.setDefaultButton(QMessageBox.StandardButton.Yes)
+        self.update_available_msg.setDefaultButton(
+            QMessageBox.StandardButton.Yes)
 
     def _verify_version(self):
         self.status.setText(self.tr("Verifying translation version..."))
@@ -71,7 +72,7 @@ class VerifyVersionPage(QWidget):
         try:
             repo = Github().get_repo(self.repo_name)
             latest_tag = repo.get_latest_release().tag_name
-        except GithubException as e:
+        except GithubException:
             self.finished.emit()
             return None
 
@@ -81,14 +82,15 @@ class VerifyVersionPage(QWidget):
 
             if result == QMessageBox.StandardButton.Yes:
                 QDesktopServices.openUrl(url)
-                QTimer.singleShot(0, self.quit.emit)  # emit after the current event loop interation
+                QTimer.singleShot(
+                    0,
+                    self.quit.emit
+                )  # emit after the current event loop interation
             else:
                 self.finished.emit()
                 return None
 
         return None
-
-
 
     def _verify_connection(self):
         self.status.setText(self.tr("Verifying internet connection..."))

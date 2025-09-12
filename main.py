@@ -6,11 +6,13 @@ from PySide6.QtWidgets import QApplication, QPushButton
 
 from src.window import AppWindow
 
+
 class _ButtonDisableFilter(QObject):
     """
     This filter prevents the hover effect
     freeze after a QPushButton is set to disable.
     """
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.EnabledChange:
             if isinstance(obj, QPushButton) and not obj.isEnabled():
@@ -18,6 +20,7 @@ class _ButtonDisableFilter(QObject):
                 obj.style().unpolish(obj)
                 obj.style().polish(obj)
         return super().eventFilter(obj, event)
+
 
 try:
     with open("config.json", "r", encoding="utf-8") as config_file:
