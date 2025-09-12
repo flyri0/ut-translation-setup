@@ -1,3 +1,5 @@
+from math import floor
+
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
@@ -39,4 +41,4 @@ class AppWindow(QMainWindow):
         if height > max_h:
             height, width = max_h, max_h * aspect
 
-        return QSize(int(round(width)), int(round(height)))
+        return QSize(int(floor(width)), int(floor(height)))
