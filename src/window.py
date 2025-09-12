@@ -17,7 +17,7 @@ class AppWindow(QMainWindow):
         self.page_stack = QStackedWidget()
         self.verify_version_page = VerifyVersionPage(
             setup_version=config["setup_version"],
-            repo_id=config["repository_id"]
+            repo_name=config["repository_full_name"]
         )
         self.page_stack.addWidget(self.verify_version_page)
 

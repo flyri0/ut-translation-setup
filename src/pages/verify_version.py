@@ -12,11 +12,11 @@ class VerifyVersionPage(QWidget):
     finished = Signal()
     quit = Signal()
 
-    def __init__(self, setup_version: str, repo_id: str):
+    def __init__(self, setup_version: str, repo_name: str):
         super().__init__()
 
         self.setup_version = setup_version
-        self.repo_id = repo_id
+        self.repo_name = repo_name
 
         self.hide_controls.emit()
         self._ui()
@@ -69,9 +69,10 @@ class VerifyVersionPage(QWidget):
         self.status.setText(self.tr("Verifying translation version..."))
 
         try:
-            repo = Github().get_repo(self.repo_id)
+            repo = Github().get_repo(self.repo_name)
             latest_tag = repo.get_latest_release().tag_name
-        except GithubException:
+        except GithubException as e:
+            print(e)
             self.finished.emit()
             return None
 
