@@ -1,7 +1,7 @@
 import json
 import sys
 
-from PySide6.QtCore import QObject, QEvent, Qt
+from PySide6.QtCore import QObject, QEvent, Qt, QResource
 from PySide6.QtWidgets import QApplication, QPushButton
 
 from src.window import AppWindow
@@ -33,6 +33,7 @@ except Exception as error:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.installEventFilter(_ButtonDisableFilter(app))
+    QResource.registerResource("assets.rcc")
 
     window = AppWindow(config=config_data)
     window.show()

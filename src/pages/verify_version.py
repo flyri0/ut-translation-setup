@@ -9,7 +9,6 @@ from github import Github, GithubException
 
 
 class VerifyVersionPage(QWidget):
-    hide_controls = Signal()
     finished = Signal()
     quit = Signal()
 
@@ -19,11 +18,9 @@ class VerifyVersionPage(QWidget):
         self.setup_version = setup_version
         self.repo_name = repo_name
 
-        self.hide_controls.emit()
         self._ui()
 
         QTimer.singleShot(0, self._verify_connection)
-        QTimer.singleShot(0, self._verify_version)
 
     def _ui(self):
         layout = QVBoxLayout(self)
@@ -65,6 +62,23 @@ class VerifyVersionPage(QWidget):
         self.update_available_msg.setDefaultButton(
             QMessageBox.StandardButton.Yes)
 
+    def _verify_connection(self):
+        self.status.setText(self.tr("Verifying internet connection..."))
+
+        if self.is_connected():
+            result = self.no_internet_msg.exec()
+
+            if result == QMessageBox.StandardButton.Cancel:
+                self.finished.emit()
+                return None
+            else:
+                self._verify_connection()
+                return None
+
+        self._verify_version()
+
+        return None
+
     def _verify_version(self):
         self.status.setText(self.tr("Verifying translation version..."))
 
@@ -88,20 +102,6 @@ class VerifyVersionPage(QWidget):
             else:
                 self.finished.emit()
                 return None
-
-        return None
-
-    def _verify_connection(self):
-        self.status.setText(self.tr("Verifying internet connection..."))
-
-        if not self.is_connected():
-            result = self.no_internet_msg.exec()
-
-            if result == QMessageBox.StandardButton.Cancel:
-                self.finished.emit()
-                return None
-            else:
-                self._verify_connection()
 
         return None
 

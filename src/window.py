@@ -4,6 +4,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
 from src.pages.verify_version import VerifyVersionPage
+from src.pages.welcome import WelcomePage
 
 
 class AppWindow(QMainWindow):
@@ -11,6 +12,7 @@ class AppWindow(QMainWindow):
         super().__init__()
 
         self.config = config
+
         screen_size = self.screen().availableGeometry()
         self.resize(self._resize_with_ratio(
             screen_size.width(),
@@ -23,9 +25,33 @@ class AppWindow(QMainWindow):
             setup_version=config["setup_version"],
             repo_name=config["repository_full_name"]
         )
+        self.welcome_page = WelcomePage()
+        self._connect_signals()
+
         self.page_stack.addWidget(self.verify_version_page)
+        self.page_stack.addWidget(self.welcome_page)
 
         self.setCentralWidget(self.page_stack)
+
+    def _connect_signals(self):
+        self.verify_version_page.quit.connect(self._on_quit)
+        self.verify_version_page.finished.connect(
+            self._on_finished
+        )
+
+        self.welcome_page.finished.connect(self._next_page)
+
+    def _on_quit(self):
+        self.close()
+
+    def _on_finished(self):
+        self._next_page()
+
+    def _next_page(self):
+        index = self.page_stack.currentIndex()
+        count = self.page_stack.count()
+        if index < count - 1:
+            self.page_stack.setCurrentIndex(index + 1)
 
     @staticmethod
     def _resize_with_ratio(
