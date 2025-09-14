@@ -22,9 +22,8 @@ class VerifyVersionPage(QWidget):
         self.hide_controls.emit()
         self._ui()
 
-        self.show()  # waits the first event loop
-        self._verify_connection()
-        self._verify_version()
+        QTimer.singleShot(0, self._verify_connection)
+        QTimer.singleShot(0, self._verify_version)
 
     def _ui(self):
         layout = QVBoxLayout(self)
