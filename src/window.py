@@ -3,6 +3,7 @@ from math import floor
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
+from src.pages.pick_target import PickTargetPage
 from src.pages.verify_version import VerifyVersionPage
 from src.pages.welcome import WelcomePage
 
@@ -26,10 +27,13 @@ class AppWindow(QMainWindow):
             repo_name=config["repository_full_name"]
         )
         self.welcome_page = WelcomePage()
+        self.pick_target_page = PickTargetPage()
+
         self._connect_signals()
 
         self.page_stack.addWidget(self.verify_version_page)
         self.page_stack.addWidget(self.welcome_page)
+        self.page_stack.addWidget(self.pick_target_page)
 
         self.setCentralWidget(self.page_stack)
 
