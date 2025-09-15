@@ -1,6 +1,7 @@
 from math import floor
 
 from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
 from src.pages.pick_target import PickTargetPage
@@ -13,6 +14,8 @@ class AppWindow(QMainWindow):
         super().__init__()
 
         self.config = config
+        self.setWindowIcon(QIcon(":icon"))
+        self.setWindowTitle(self.tr("Until Then - Install Translation"))
 
         screen_size = self.screen().availableGeometry()
         self.resize(self._resize_with_ratio(

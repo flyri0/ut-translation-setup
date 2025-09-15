@@ -37,7 +37,7 @@ class WelcomePage(QWidget):
 
         message = QLabel(
             f"""
-                <h2>{self.tr("Until Then... <i>in portuguese!</i>")}</h2>
+                <h2>{self.tr("Until Then... <i>in portuguese!</i> ✨")}</h2>
                 
                 <p>
                 {self.tr(
@@ -82,8 +82,8 @@ class WelcomePage(QWidget):
         message_and_button_frame.layout().addWidget(message)
         message_and_button_frame.layout().addWidget(self.next_button)
 
-        layout.addWidget(self.banner_label, 1)
-        layout.addWidget(message_and_button_frame)
+        layout.addWidget(self.banner_label)
+        layout.addWidget(message_and_button_frame, 1)
 
         self._update_banner_size()
 
