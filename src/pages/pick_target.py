@@ -20,14 +20,14 @@ class PickTargetPage(QWidget):
 
         self.path_label = QLabel()
 
-        path_label_box = QGroupBox(self)
+        path_label_box = QGroupBox()
         path_label_box.setTitle(self.tr("Selected file:"))
         path_label_box.setSizePolicy(
             QSizePolicy.Policy.MinimumExpanding,
             QSizePolicy.Policy.Fixed,
         )
         path_label_box.setLayout(QHBoxLayout())
-        path_label_box.layout().addWidget(path_label_box)
+        path_label_box.layout().addWidget(self.path_label)
 
         self.status_label = QLabel()
         self.status_label.setText(self.tr("UntilThen.pck not selected"))
