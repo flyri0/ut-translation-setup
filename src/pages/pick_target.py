@@ -143,7 +143,7 @@ class PickTargetPage(QWidget):
 
         is_demo = True if path.parent.name == "Until Then Demo" else False
         if path.exists() and path.is_file() and path.suffix == ".pck":
-            self._set_status(is_valid=True)
+            self._set_status(is_valid=True, is_demo=is_demo)
             self.target_path = path
             self.is_demo = is_demo
             self.path_label.setText(str(path))
@@ -169,14 +169,25 @@ class PickTargetPage(QWidget):
 
         return None
 
-    def _set_status(self, is_valid: bool):
+    def _set_status(self, is_valid: bool, is_demo: bool = False):
         if is_valid:
-            self.status_label.setText(self.tr("UntilThen.pck found"))
+            if is_demo:
+                demo_message = self.tr(
+                    ". You're using the demo version of Until Then"
+                )
+            else:
+                demo_message = ""
+
+            self.status_label.setText(self.tr(
+                "UntilThen.pck is valid"
+            ) + demo_message)
             self.status_label.setStyleSheet(
                 "color: #00c951; font-weight: bold;"
             )
         else:
-            self.status_label.setText(self.tr("UntilThen.pck not found"))
+            self.status_label.setText(self.tr(
+                "A valid file could not be found."
+            ))
             self.status_label.setStyleSheet(
                 "color: #fb2c36; font-weight: bold;"
             )
