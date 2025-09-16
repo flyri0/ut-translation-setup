@@ -64,6 +64,7 @@ class PickTargetPage(QWidget):
         buttons_frame_layout.addWidget(self.pick_file_button, 1)
 
         self.next_page_button = QPushButton(self.tr("Next") + " ")
+        self.next_page_button.clicked.connect(self._handle_next_page)
         self.next_page_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.next_page_button.setEnabled(False)
         self.next_page_button.setLayoutDirection(

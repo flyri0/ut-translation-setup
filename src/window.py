@@ -1,9 +1,11 @@
 from math import floor
+from pathlib import Path
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
+from src.pages.install_files import InstallFilesPage
 from src.pages.pick_target import PickTargetPage
 from src.pages.verify_version import VerifyVersionPage
 from src.pages.welcome import WelcomePage
@@ -31,12 +33,14 @@ class AppWindow(QMainWindow):
         )
         self.welcome_page = WelcomePage()
         self.pick_target_page = PickTargetPage()
+        self.install_files_page = InstallFilesPage()
 
         self._connect_signals()
 
         self.page_stack.addWidget(self.verify_version_page)
         self.page_stack.addWidget(self.welcome_page)
         self.page_stack.addWidget(self.pick_target_page)
+        self.page_stack.addWidget(self.install_files_page)
 
         self.setCentralWidget(self.page_stack)
 
@@ -47,6 +51,13 @@ class AppWindow(QMainWindow):
         )
 
         self.welcome_page.finished.connect(self._next_page)
+
+        self.pick_target_page.finished.connect(self._on_pick_target_finished)
+
+    def _on_pick_target_finished(self, target_path: Path, is_demo: bool):
+        self.install_files_page.set_target_path(target_path)
+        self.install_files_page.set_is_demo(is_demo)
+        self._next_page()
 
     def _on_quit(self):
         self.close()
