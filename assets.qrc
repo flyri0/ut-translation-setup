@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file alias="banner">assets/banner.png</file>
         <file alias="icon">assets/icon.ico</file>
+        <file alias="translation_files">assets/translation_files.zip</file>
     </qresource>
 </RCC>
