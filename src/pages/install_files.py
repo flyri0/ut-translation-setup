@@ -1,9 +1,13 @@
 import io
+import platform
+import stat
 import zipfile
 from pathlib import Path
 from typing import Optional
 
-from PySide6.QtCore import Signal, QObject, QThread, QFile, QTemporaryDir, Qt
+from PySide6.QtCore import Signal, QObject, QThread, QFile, QTemporaryDir, \
+    Qt, QProcess
+from PySide6.QtGui import QShowEvent
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QProgressBar, \
     QLabel
 
@@ -28,6 +32,7 @@ class InstallFilesPage(QWidget):
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 0)
 
         self.log_widget = _LogWidget()
 
@@ -36,6 +41,88 @@ class InstallFilesPage(QWidget):
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.log_widget)
         layout.addStretch()
+
+    def showEvent(self, event: QShowEvent) -> None:
+        self._unzip_translation_files()
+
+    def _unzip_translation_files(self):
+        temp_dir_path = Path(self.temp_dir.path())
+        translation_files_resource = ":translation_files"
+
+        self._unzip(
+            translation_files_resource,
+            temp_dir_path,
+            "translation_files",
+            on_finished=self._unzip_pck_explorer,
+        )
+
+    def _unzip_pck_explorer(self):
+        system = platform.system()
+        temp_dir_path = Path(self.temp_dir.path())
+        pck_explorer_bin: str
+
+        if system == "Windows":
+            pck_explorer_bin = ":win_pck_explorer"
+        else:
+            pck_explorer_bin = ":linux_pck_explorer"
+
+        self._clear_feedback()
+        self._unzip(
+            pck_explorer_bin,
+            temp_dir_path,
+            "pck_explorer",
+            on_finished=self._install_files,
+        )
+
+    def _install_files(self):
+        self.status_label.setText(self.tr("Installing translation files..."))
+        system = platform.system()
+        temp_dir_path = Path(self.temp_dir.path())
+        base_files_path = temp_dir_path / "translation_files"
+        files_path: Path
+        pck_explorer_bin = temp_dir_path / "pck_explorer"
+
+        if self._is_demo:
+            files_path = base_files_path / "demo"
+        else:
+            files_path = base_files_path / "full"
+
+        if system == "Windows":
+            pck_explorer_bin = (pck_explorer_bin
+                                / "GodotPCKExplorer.Console.exe")
+        else:
+            pck_explorer_bin = pck_explorer_bin / "GodotPCKExplorer.Console"
+            mode = pck_explorer_bin.stat().st_mode
+            if not (mode & stat.S_IXUSR):
+                pck_explorer_bin.chmod(mode | stat.S_IXUSR)
+
+        self.process = QProcess()
+        self.process.readyReadStandardOutput.connect(
+            lambda: _log_output()
+        )
+
+        self.process.start(
+            str(pck_explorer_bin.absolute().resolve()),
+            [
+                "-pc",
+                str(self._target_path.absolute().resolve()),
+                str(files_path.absolute().resolve()),
+                str(Path(self._target_path.parent / "ModifiedPCK.pck")
+                    .absolute().resolve()),
+                "2.2.4.1"
+            ]
+        )
+
+        def _log_output():
+            data = self.process.readAllStandardOutput().data().decode()
+            self.log_widget.append_message(str(data))
+
+    def _clear_feedback(self):
+        self._total_files = 0
+        self.progress_bar.setValue(0)
+        self.progress_bar.setRange(0, 0)
+        self.status_label.setText(self.tr("Extraction Complete!"))
+        self.log_widget.clear()
 
     def set_target_path(self, target_path: Path):
         self._target_path = target_path
@@ -48,9 +135,12 @@ class InstallFilesPage(QWidget):
         self._total_files = total_files
 
     def _on_progress(self, count: int, name: str):
-        self.status_label.setText(self.tr(
-            f"Extracting {count} of {self._total_files}"
-        ))
+        self.status_label.setText(
+            self.tr("Extracting ")
+            + str(count)
+            + self.tr(" of ")
+            + str(self._total_files)
+        )
         self.progress_bar.setValue(count)
         self.log_widget.append_message(name)
 
@@ -58,7 +148,8 @@ class InstallFilesPage(QWidget):
             self,
             resource: str,
             destination: Path,
-            folder_name: str
+            folder_name: str,
+            on_finished,
     ):
         file = QFile(resource)
         if not file.open(QFile.OpenModeFlag.ReadOnly):
@@ -67,22 +158,24 @@ class InstallFilesPage(QWidget):
         data = bytes(file.readAll().data())
         file.close()
 
-        self.unzip_thread = QThread(self)
-        self.unzip_worker = _UnzipWorker()
+        unzip_thread = QThread(self)
+        unzip_worker = _UnzipWorker()
 
-        self.unzip_worker.moveToThread(self.unzip_thread)
-        self.unzip_thread.started.connect(
-            lambda: self.unzip_worker.run(data, destination, folder_name)
+        unzip_worker.moveToThread(unzip_thread)
+        unzip_thread.started.connect(
+            lambda: unzip_worker.run(data, destination, folder_name)
         )
 
-        self.unzip_worker.total_files.connect(self._on_total_files)
-        self.unzip_worker.progress.connect(self._on_progress)
+        unzip_worker.total_files.connect(self._on_total_files)
+        unzip_worker.progress.connect(self._on_progress)
+        if on_finished:
+            unzip_worker.finished.connect(on_finished)
 
-        self.unzip_worker.finished.connect(self.unzip_thread.quit)
-        self.unzip_worker.finished.connect(self.unzip_worker.deleteLater)
-        self.unzip_thread.finished.connect(self.unzip_thread.deleteLater)
+        unzip_worker.finished.connect(unzip_thread.quit)
+        unzip_worker.finished.connect(unzip_worker.deleteLater)
+        unzip_thread.finished.connect(unzip_thread.deleteLater)
 
-        self.unzip_thread.start()
+        unzip_thread.start()
 
 
 class _UnzipWorker(QObject):
@@ -115,7 +208,6 @@ class _UnzipWorker(QObject):
             self.finished.emit()
         except Exception as e:
             self.error.emit(e)
-            self.finished.emit()
             return None
 
 
@@ -126,6 +218,14 @@ class _LogWidget(QTextEdit):
         self.setReadOnly(True)
         self.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
         self.viewport().setCursor(Qt.CursorShape.ArrowCursor)
+        self.document().setMaximumBlockCount(100)
+        self.horizontalScrollBar().setVisible(False)
+        self.setStyleSheet("""
+            QTextEdit {
+                font-family: sans-serif;
+                font-size: 10pt;
+            }
+        """)
 
     def append_message(self, message: str):
         self.append(message)

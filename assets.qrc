@@ -3,5 +3,7 @@
         <file alias="banner">assets/banner.png</file>
         <file alias="icon">assets/icon.ico</file>
         <file alias="translation_files">assets/translation_files.zip</file>
+        <file alias="win_pck_explorer">assets/GodotPCKExplorer_1.5.3_native-console-win-64.zip</file>
+        <file alias="linux_pck_explorer">assets/GodotPCKExplorer_1.5.3_native-console-linux-64.zip</file>
     </qresource>
 </RCC>
