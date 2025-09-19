@@ -24,6 +24,7 @@ class PickTargetPage(QWidget):
     def _ui(self):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.setContentsMargins(50, 0, 50, 0)
 
         self.path_label = QLabel()
 

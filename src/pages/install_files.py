@@ -21,7 +21,7 @@ class InstallFilesPage(QWidget):
 
     def _ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(100, 0, 100, 0)
+        layout.setContentsMargins(50, 0, 50, 0)
 
         self.status_label = QLabel()
         self.status_label.setText(self.tr("Extracting Files..."))
