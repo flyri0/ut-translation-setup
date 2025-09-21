@@ -33,13 +33,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Custom pre-build commands (adjust as needed)
-      - name: Run pre-build commands
-        run: |
-          echo "Running pre-build setup..."
-          # Example: generate resources, copy configs, etc.
-          pyside6-rcc --binary assets.qrc -o assets.rc
-
       # Nuitka build
       - name: Build with Nuitka
         uses: Nuitka/Nuitka-Action@main
