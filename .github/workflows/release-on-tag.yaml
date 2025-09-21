@@ -49,8 +49,8 @@ jobs:
         with:
           name: ${{ runner.os }} Build
           path: |
-            build/*.exe
-            build/*.bin
+            build/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}.exe
+            build/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}
           include-hidden-files: true
 
   release:
