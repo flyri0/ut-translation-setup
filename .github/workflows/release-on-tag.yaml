@@ -35,7 +35,7 @@ jobs:
         with:
           nuitka-version: main
           script-name: main.py
-          mode: app
+          mode: onefile
           output-file: Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}
           windows-icon-from-ico: assets/icon.ico
           linux-icon: assets/icon.ico
@@ -43,6 +43,7 @@ jobs:
           include-data-files: |
             assets.rcc=assets.rcc
             config.json=config.json
+            assets/icon.ico=assets/icon.ico
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
