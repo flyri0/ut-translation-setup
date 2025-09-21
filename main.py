@@ -4,6 +4,7 @@ import sys
 from PySide6.QtCore import QObject, QEvent, Qt, QResource
 from PySide6.QtWidgets import QApplication, QPushButton
 
+from src.utils import resource_path
 from src.window import AppWindow
 
 
@@ -23,7 +24,7 @@ class _ButtonDisableFilter(QObject):
 
 
 try:
-    with open("config.json", "r", encoding="utf-8") as config_file:
+    with open(resource_path("config.json"), "r", encoding="utf-8") as config_file:
         config_data = json.load(config_file)
 except Exception as error:
     print("Configuration file not found.")
@@ -33,7 +34,7 @@ except Exception as error:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.installEventFilter(_ButtonDisableFilter(app))
-    QResource.registerResource("assets.rcc")
+    QResource.registerResource(str(resource_path("assets.rcc")))
 
     window = AppWindow(config=config_data)
     window.show()
