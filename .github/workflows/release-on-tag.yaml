@@ -50,7 +50,7 @@ jobs:
           windows-icon-from-ico: "assets/icon.ico"
           enable-plugins: pyside6
           include-data-files: |
-            assets.rcc
+            assets.rcc=assets.rcc
 
       # Archive the build output
       - name: Upload artifacts
