@@ -103,6 +103,7 @@ class VerifyVersionPage(QWidget):
                 self.finished.emit()
                 return None
 
+        self.finished.emit()
         return None
 
     @staticmethod
