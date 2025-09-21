@@ -39,9 +39,10 @@ jobs:
         with:
           nuitka-version: main
           script-name: main.py
-          mode: onefile
+          mode: "app"
           output-file: "until-then-tradução-${{ runner.os }}"
           windows-icon-from-ico: "assets/icon.ico"
+          linux-icon: "assets/icon.ico"
           enable-plugins: pyside6
           include-data-files: |
             assets.rcc=assets.rcc
