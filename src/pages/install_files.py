@@ -1,5 +1,6 @@
 import io
 import platform
+import shutil
 import stat
 import zipfile
 from pathlib import Path
@@ -7,7 +8,6 @@ from typing import Optional
 
 from PySide6.QtCore import Signal, QObject, QThread, QFile, QTemporaryDir, \
     Qt, QProcess
-from PySide6.QtGui import QShowEvent
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QProgressBar, \
     QLabel
 
@@ -22,6 +22,11 @@ class InstallFilesPage(QWidget):
         self._total_files = 0
         self.temp_dir = QTemporaryDir()
         self._ui()
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+
+        self._unzip_translation_files()
 
     def _ui(self):
         layout = QVBoxLayout(self)
@@ -41,9 +46,6 @@ class InstallFilesPage(QWidget):
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.log_widget)
         layout.addStretch()
-
-    def showEvent(self, event: QShowEvent) -> None:
-        self._unzip_translation_files()
 
     def _unzip_translation_files(self):
         temp_dir_path = Path(self.temp_dir.path())
@@ -76,6 +78,8 @@ class InstallFilesPage(QWidget):
 
     def _install_files(self):
         self.status_label.setText(self.tr("Installing translation files..."))
+        self.progress_bar.setRange(0, 0)
+
         system = platform.system()
         temp_dir_path = Path(self.temp_dir.path())
         base_files_path = temp_dir_path / "translation_files"
@@ -112,10 +116,23 @@ class InstallFilesPage(QWidget):
                 "2.2.4.1"
             ]
         )
+        self.process.finished.connect(self._on_install_finished)
 
         def _log_output():
             data = self.process.readAllStandardOutput().data().decode()
             self.log_widget.append_message(str(data))
+
+    def _on_install_finished(self):
+        src = Path(self._target_path)
+        backup = src.with_name(src.name + ".bak")
+        modified = Path(src.parent) / "ModifiedPCK.pck"
+
+        if src.exists():
+            shutil.move(str(src), str(backup))
+
+        shutil.move(str(modified), str(src))
+
+        self.finished.emit()
 
     def _clear_feedback(self):
         self._total_files = 0
