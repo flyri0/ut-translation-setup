@@ -72,7 +72,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/**/*.exe
-            ./artifacts/**/*.bin
+            ./artifacts/**/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
