@@ -40,7 +40,7 @@ jobs:
           nuitka-version: main
           script-name: main.py
           mode: "app"
-          output-file: "until-then-tradução-${{ runner.os }}"
+          output-file: "Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}"
           windows-icon-from-ico: "assets/icon.ico"
           linux-icon: "assets/icon.ico"
           enable-plugins: pyside6
