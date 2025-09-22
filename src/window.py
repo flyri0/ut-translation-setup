@@ -57,6 +57,7 @@ class AppWindow(QMainWindow):
 
         self.pick_target_page.finished.connect(self._on_pick_target_finished)
         self.install_files_page.finished.connect(self._next_page)
+        self.final_page.quit.connect(self._on_quit)
 
     def _on_pick_target_finished(self, target_path: Path, is_demo: bool):
         self.install_files_page.set_target_path(target_path)

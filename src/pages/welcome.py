@@ -27,7 +27,6 @@ class WelcomePage(QWidget):
         self.next_button.setText(self.tr("Let's Go!"))
         self.next_button.setMinimumHeight(50)
         self.next_button.setDefault(True)
-        self.next_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.next_button.setStyleSheet(
             """
             font-size: 15px;

@@ -65,7 +65,7 @@ class VerifyVersionPage(QWidget):
     def _verify_connection(self):
         self.status.setText(self.tr("Verifying internet connection..."))
 
-        if not self.is_connected():
+        if self.is_connected():
             result = self.no_internet_msg.exec()
 
             if result == QMessageBox.StandardButton.Cancel:
