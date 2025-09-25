@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import Optional
 
 from PySide6.QtCore import Signal, QObject, QThread, QFile, QTemporaryDir, \
-    Qt, QProcess
+    Qt, QProcess, QTimer
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QProgressBar, \
-    QLabel
+    QLabel, QSizePolicy
 
 
 class InstallFilesPage(QWidget):
@@ -23,10 +23,10 @@ class InstallFilesPage(QWidget):
         self.temp_dir = QTemporaryDir()
         self._ui()
 
-    def showEvent(self, event) -> None:
-        super().showEvent(event)
-
-        self._unzip_translation_files()
+    # def showEvent(self, event) -> None:
+    #     super().showEvent(event)
+    #
+    #     self._unzip_translation_files()
 
     def _ui(self):
         layout = QVBoxLayout(self)
@@ -37,6 +37,7 @@ class InstallFilesPage(QWidget):
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.progress_bar = QProgressBar()
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.progress_bar.setRange(0, 0)
 
         self.log_widget = _LogWidget()
@@ -101,8 +102,12 @@ class InstallFilesPage(QWidget):
                 pck_explorer_bin.chmod(mode | stat.S_IXUSR)
 
         self.process = QProcess()
-        self.process.readyReadStandardOutput.connect(
-            lambda: _log_output()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._log_output)
+        self.timer.start(1000)
+        self.process.finished.connect(self._on_install_finished)
+        self.process.setProcessChannelMode(
+            QProcess.ProcessChannelMode.MergedChannels
         )
 
         self.process.start(
@@ -116,11 +121,17 @@ class InstallFilesPage(QWidget):
                 "2.2.4.1"
             ]
         )
-        self.process.finished.connect(self._on_install_finished)
 
-        def _log_output():
-            data = self.process.readAllStandardOutput().data().decode()
-            self.log_widget.append_message(str(data))
+    def _log_output(self):
+        byte_array = self.process.readLine()
+        text = byte_array.data().decode(errors="replace")
+        system = platform.system()
+
+        if system == "Windows":
+            self.log_widget.setVisible(False)
+            return
+
+        self.log_widget.append(text)
 
     def _on_install_finished(self):
         src = Path(self._target_path)
