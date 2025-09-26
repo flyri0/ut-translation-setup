@@ -9,7 +9,7 @@ from typing import Optional
 from PySide6.QtCore import Signal, QObject, QThread, QFile, QTemporaryDir, \
     Qt, QProcess, QTimer
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QProgressBar, \
-    QLabel, QSizePolicy
+    QLabel
 
 
 class InstallFilesPage(QWidget):
@@ -23,10 +23,10 @@ class InstallFilesPage(QWidget):
         self.temp_dir = QTemporaryDir()
         self._ui()
 
-    # def showEvent(self, event) -> None:
-    #     super().showEvent(event)
-    #
-    #     self._unzip_translation_files()
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+
+        self._unzip_translation_files()
 
     def _ui(self):
         layout = QVBoxLayout(self)
