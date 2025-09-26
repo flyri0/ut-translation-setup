@@ -28,7 +28,7 @@ class FinalPage(QWidget):
             <center>
              <h1>{self.tr("Installation complete! 🎉")}</h1>
              <p>{self.tr("""
-                Now it’s your turn to dive into this journey.
+                Now it's your turn to dive into this journey.
                 We hope every moment of <i>Until Then</i> touches you deeply,
                 just as it touched us while bringing it to you.
              """)}</p>
