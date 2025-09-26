@@ -35,41 +35,31 @@ class WelcomePage(QWidget):
         )
 
         message = QLabel(
-            f"""
-                <h2>{self.tr("Until Then... <i>in portuguese!</i> ✨")}</h2>
-                
-                <p>
-                {self.tr(
+            "<h2>" + self.tr(
+                "Until Then... <i>in portuguese!</i> ✨") + "</h2>" +
+            "<p>" +
+            self.tr(
                 "Thank you for being here!"
                 " This translation was made with love"
                 " by fans, so that more people can experience the story"
                 " of <i>Until Then</i> in our language."
                 " We hope it moves you as much as it moved us."
-            )}
-                </p>
-                <br>
-                <center>
-                    <i>
-                        {self.tr("Translation by:")}<br>
-                        {self.tr("person · person · person · person")}<br><br>
-                        
-                        {self.tr("Installer by:")}<br>
-                        <a href="https://github.com/flyri0">flyr0</a>
-                        <br>
-                    </i>
-                    <br>
-                    <a style="text-decoration: none;"
-                        href=\"{self.tr("https://discord.gg/MKn6QBVG9g")}\">
-                        Discord
-                    </a>
-                    ·
-                    <a style="text-decoration: none;"
-                        href=\"{self.tr("https://github.com/flyri0/ut-translation-setup")}\">
-                        Github
-                    </a>
-                </center>
-            """
+            ) +
+            "</p><br>" +
+            "<center><i>" +
+            self.tr("Translation by:") + "<br>" +
+            self.tr("person · person · person · person") + "<br><br>" +
+            self.tr("Installer by:") + "<br>" +
+            '<a href="https://github.com/flyri0">flyr0</a><br>' +
+            "</i><br>" +
+            '<a style="text-decoration: none;" '
+            'href="https://discord.gg/MKn6QBVG9g">Discord</a> · ' +
+            '<a style="text-decoration: none;" '
+            'href="https://github.com/flyri0/ut-translation-setup">Github</a'
+            '>' +
+            "</center>"
         )
+
         message.setWordWrap(True)
         message.setOpenExternalLinks(True)
         message.setContentsMargins(10, 0, 10, 0)
