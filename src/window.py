@@ -18,7 +18,7 @@ class AppWindow(QMainWindow):
 
         self.config = config
         self.setWindowIcon(QIcon(":icon"))
-        self.setWindowTitle(self.tr("Until Then - Install Translation"))
+        self.setWindowTitle(self.tr("Until Then - Instalar Tradução"))
 
         screen_size = self.screen().availableGeometry()
         self.resize(self._resize_with_ratio(

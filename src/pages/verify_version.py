@@ -38,10 +38,10 @@ class VerifyVersionPage(QWidget):
 
         self.no_internet_msg = QMessageBox(parent=self)
         self.no_internet_msg.setIcon(QMessageBox.Icon.Warning)
-        self.no_internet_msg.setWindowTitle(self.tr("No internet connection"))
+        self.no_internet_msg.setWindowTitle(self.tr("Sem conexão"))
         self.no_internet_msg.setText(self.tr(
-            "You are not connected to the internet. "
-            "Please check your internet connection and try again."
+            "Você não está conectado a internet. "
+            "Por favor, cheque sua conexão e tente novamente."
         ))
         self.no_internet_msg.setStandardButtons(
             QMessageBox.StandardButton.Cancel
@@ -51,10 +51,12 @@ class VerifyVersionPage(QWidget):
 
         self.update_available_msg = QMessageBox(parent=self)
         self.update_available_msg.setIcon(QMessageBox.Icon.Information)
-        self.update_available_msg.setWindowTitle(self.tr("Update available"))
+        self.update_available_msg.setWindowTitle(self.tr(
+            "Atualização disponível"
+        ))
         self.update_available_msg.setText(self.tr(
-            "A new translation update is available. "
-            "Do you wish to download now?"
+            "Uma atualização da tradução está disponível "
+            "Deseja atualizar?"
         ))
         self.update_available_msg.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -63,7 +65,7 @@ class VerifyVersionPage(QWidget):
             QMessageBox.StandardButton.Yes)
 
     def _verify_connection(self):
-        self.status.setText(self.tr("Verifying internet connection..."))
+        self.status.setText(self.tr("Verificando conexão com a internet..."))
 
         if not self.is_connected():
             result = self.no_internet_msg.exec()
@@ -80,7 +82,7 @@ class VerifyVersionPage(QWidget):
         return None
 
     def _verify_version(self):
-        self.status.setText(self.tr("Verifying translation version..."))
+        self.status.setText(self.tr("Verificando versão da tradução..."))
 
         try:
             repo = Github().get_repo(self.repo_name)

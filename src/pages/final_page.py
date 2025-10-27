@@ -25,13 +25,12 @@ class FinalPage(QWidget):
         )
         message.setText(
             "<center>" +
-            "<h1>" + self.tr("Installation complete! 🎉") + "</h1>" +
+            "<h1>" + self.tr("Instalação completa! 🎉") + "</h1>" +
             "<p>" +
             self.tr(
-                "Now it's your turn to dive into this journey."
-                " We hope every moment of"
-                " <i>Until Then</i> touches you deeply,"
-                " just as it touched us while bringing it to you."
+                "De coração, muito obrigado pela confiança! Foi um esforço de paixão de toda a equipe."
+                " Caso encontre algum erro ou tenha alguma sugestão, por favor, não hesite em nos contatar!" + "<p>"
+                + "No mais, aproveite a viagem. Bom jogo! 🫡"
             ) +
             "</p>" +
             "</center>"
@@ -45,7 +44,7 @@ class FinalPage(QWidget):
         gif_label.setMovie(gif_movie)
         gif_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.close_button = QPushButton(self.tr("Close"))
+        self.close_button = QPushButton(self.tr("Até Lá!"))
         self.close_button.setMinimumHeight(50)
         self.close_button.clicked.connect(self._on_close)
         self.close_button.setStyleSheet(

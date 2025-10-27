@@ -24,7 +24,7 @@ class WelcomePage(QWidget):
 
         self.next_button = QPushButton()
         self.next_button.clicked.connect(self.finished.emit)
-        self.next_button.setText(self.tr("Let's Go!"))
+        self.next_button.setText(self.tr("Vamos lá!"))
         self.next_button.setMinimumHeight(50)
         self.next_button.setDefault(True)
         self.next_button.setStyleSheet(
@@ -36,20 +36,20 @@ class WelcomePage(QWidget):
 
         message = QLabel(
             "<h2>" + self.tr(
-                "Until Then... <i>in portuguese!</i> ✨") + "</h2>" +
+                "Until Then... <i>em português!</i> ✨") + "</h2>" +
             "<p>" +
             self.tr(
-                "Thank you for being here!"
-                " This translation was made with love"
-                " by fans, so that more people can experience the story"
-                " of <i>Until Then</i> in our language."
-                " We hope it moves you as much as it moved us."
+                "Essa tradução foi feita com muito carinho por fãs, para que mais pessoas possam desfrutar de <i>Until Then</i> em nosso belíssimo português." + "<p>"
+                + "Esperamos que te emocione tanto quanto nos emocionou."
             ) +
             "</p><br>" +
             "<center><i>" +
-            self.tr("Translation by:") + "<br>" +
-            self.tr("person · person · person · person") + "<br><br>" +
-            self.tr("Installer by:") + "<br>" +
+            self.tr("Tradução por:") + "<br>" +
+            '<div style="display: text-align: left;">' +
+            "• Bernardo Hoffmann (PitterG4)" + "<br>" + "• Eduarda Albuquerque (Yubi)" + "<br>"
+            + "• Lucas Silva (Lucasxt)" + "<br>" + "• Gabriel Araújo (Percival)" + '</div>'
+            + "<br><br>" +
+            self.tr("Instalador por:") + "<br>" +
             '<a href="https://github.com/flyri0">flyr0</a><br>' +
             "</i><br>" +
             '<a style="text-decoration: none;" '

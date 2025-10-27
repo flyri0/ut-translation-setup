@@ -33,12 +33,14 @@ class InstallFilesPage(QWidget):
         layout.setContentsMargins(50, 0, 50, 0)
 
         self.status_label = QLabel()
-        self.status_label.setText(self.tr("Extracting Files..."))
+        self.status_label.setText(self.tr("Extraindo arquivos..."))
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.progress_bar.setRange(0, 0)
+
+        self.progress_bar.setTextVisible(False)
 
         self.log_widget = _LogWidget()
 
@@ -78,7 +80,7 @@ class InstallFilesPage(QWidget):
         )
 
     def _install_files(self):
-        self.status_label.setText(self.tr("Installing translation files..."))
+        self.status_label.setText(self.tr("Instalando arquivos de tradução..."))
         self.progress_bar.setRange(0, 0)
 
         system = platform.system()
@@ -149,7 +151,7 @@ class InstallFilesPage(QWidget):
         self._total_files = 0
         self.progress_bar.setValue(0)
         self.progress_bar.setRange(0, 0)
-        self.status_label.setText(self.tr("Extraction Complete!"))
+        self.status_label.setText(self.tr("Extração completa!"))
         self.log_widget.clear()
 
     def set_target_path(self, target_path: Path):
@@ -164,9 +166,9 @@ class InstallFilesPage(QWidget):
 
     def _on_progress(self, count: int, name: str):
         self.status_label.setText(
-            self.tr("Extracting ")
+            self.tr("Extraindo ")
             + str(count)
-            + self.tr(" of ")
+            + self.tr(" de ")
             + str(self._total_files)
         )
         self.progress_bar.setValue(count)
@@ -181,7 +183,7 @@ class InstallFilesPage(QWidget):
     ):
         file = QFile(resource)
         if not file.open(QFile.OpenModeFlag.ReadOnly):
-            raise Exception(f"Failed to open resource {resource}")
+            raise Exception(f"Falha ao abrir {resource}")
 
         data = bytes(file.readAll().data())
         file.close()

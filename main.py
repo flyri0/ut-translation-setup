@@ -1,7 +1,8 @@
 import json
 import sys
 
-from PySide6.QtCore import QObject, QEvent, Qt, QResource
+from PySide6.QtCore import QObject, QEvent, Qt, QResource, QTranslator, \
+    QLocale, QLibraryInfo
 from PySide6.QtWidgets import QApplication, QPushButton
 
 from src.utils import resource_path
@@ -35,6 +36,14 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.installEventFilter(_ButtonDisableFilter(app))
     QResource.registerResource(str(resource_path("assets.rcc")))
+
+    translator = QTranslator()
+    locale = QLocale.system().name()
+
+    translation_path = QLibraryInfo.path(
+        QLibraryInfo.LibraryPath.TranslationsPath)
+    if translator.load(f"qtbase_{locale}", translation_path):
+        app.installTranslator(translator)
 
     window = AppWindow(config=config_data)
     window.show()

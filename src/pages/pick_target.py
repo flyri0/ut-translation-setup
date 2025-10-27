@@ -29,7 +29,7 @@ class PickTargetPage(QWidget):
         self.path_label = QLabel()
 
         path_label_box = QGroupBox()
-        path_label_box.setTitle(self.tr("Selected file:"))
+        path_label_box.setTitle(self.tr("Arquivo selecionado:"))
         path_label_box.setSizePolicy(
             QSizePolicy.Policy.MinimumExpanding,
             QSizePolicy.Policy.Fixed,
@@ -38,24 +38,24 @@ class PickTargetPage(QWidget):
         path_label_box.layout().addWidget(self.path_label)
 
         self.status_label = QLabel()
-        self.status_label.setText(self.tr("UntilThen.pck not selected"))
+        self.status_label.setText(self.tr("UntilThen.pck não selecionado"))
         self.status_label.setStyleSheet("color: #6a7282; font-weight: bold;")
 
-        self.pick_file_button = QPushButton(self.tr("Manually Pick"))
+        self.pick_file_button = QPushButton(self.tr("Procurar..."))
         self.pick_file_button.clicked.connect(self._handle_file_pick)
         self.pick_file_button.setIcon(qtawesome.icon("fa6s.folder-open"))
         self.pick_file_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.pick_file_button.setToolTip(self.tr(
-            "Manually pick UntilThen.pck from the game installation directory."
+            "Procurar manualmente UntilThen.pck no diretório de instalação do jogo."
         ))
 
-        self.quick_find_button = QPushButton(self.tr("Quick Find"))
+        self.quick_find_button = QPushButton(self.tr("Busca Automática"))
         self.quick_find_button.clicked.connect(self._handle_quick_find)
         self.quick_find_button.setIcon(qtawesome.icon("fa6s.magnifying-glass"))
         self.quick_find_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.quick_find_button.setToolTip(self.tr(
-            "Automatically searches for UntilThen.pck in common locations;"
-            " works only with Steam installs."
+            "Busca automaticamente por UntilThen.pck em diretórios comuns;"
+            " funciona apenas caso tenha sido instalado através da Steam."
         ))
 
         buttons_frame = QFrame()
@@ -64,7 +64,7 @@ class PickTargetPage(QWidget):
         buttons_frame_layout.addWidget(self.quick_find_button, 2)
         buttons_frame_layout.addWidget(self.pick_file_button, 1)
 
-        self.next_page_button = QPushButton(self.tr("Next") + " ")
+        self.next_page_button = QPushButton(self.tr("Próximo") + " ")
         self.next_page_button.clicked.connect(self._handle_next_page)
         self.next_page_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.next_page_button.setEnabled(False)
@@ -86,16 +86,16 @@ class PickTargetPage(QWidget):
         layout.addWidget(self.next_page_button)
 
         self.pick_file_dialog = QFileDialog(parent=self)
-        self.pick_file_dialog.setWindowTitle(self.tr("Pick UntilThen.pck"))
+        self.pick_file_dialog.setWindowTitle(self.tr("Selecione UntilThen.pck"))
         self.pick_file_dialog.setFilter(QDir.Filter.Files)
         self.pick_file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         self.pick_file_dialog.setNameFilter("UntilThen.pck (*.pck)")
 
         self.file_not_found_message = QMessageBox(parent=self)
-        self.file_not_found_message.setWindowTitle(self.tr("File Not Found"))
+        self.file_not_found_message.setWindowTitle(self.tr("Arquivo não encontrado"))
         self.file_not_found_message.setText(self.tr(
-            "UntilThen.pck could not be located automatically."
-            " Please select the game executable manually."
+            "UntilThen.pck não pôde ser localizado automaticamente."
+            " Por favor, selecione-o manualmente."
         ))
         self.file_not_found_message.setIcon(QMessageBox.Icon.Warning)
         self.file_not_found_message.setStandardButtons(
@@ -104,10 +104,10 @@ class PickTargetPage(QWidget):
 
         self.file_not_selected_message = QMessageBox(parent=self)
         self.file_not_selected_message.setWindowTitle(self.tr(
-            "No file selected"
+            "Nenhum arquivo selecionado"
         ))
         self.file_not_selected_message.setText(self.tr(
-            "You did not select UntilThen.pck. Please try again."
+            "Você não selecionou UntilThen.pck. Por favor, tente novamente."
         ))
         self.file_not_selected_message.setIcon(QMessageBox.Icon.Information)
         self.file_not_selected_message.setStandardButtons(
@@ -175,20 +175,20 @@ class PickTargetPage(QWidget):
         if is_valid:
             if is_demo:
                 demo_message = self.tr(
-                    ". You're using the demo version of Until Then"
+                    "Você possui a versão Demo de Until Then."
                 )
             else:
                 demo_message = ""
 
             self.status_label.setText(self.tr(
-                "UntilThen.pck is valid"
+                "UntilThen.pck é valido."
             ) + demo_message)
             self.status_label.setStyleSheet(
                 "color: #00c951; font-weight: bold;"
             )
         else:
             self.status_label.setText(self.tr(
-                "A valid file could not be found."
+                "Não foi encontrado um arquivo válido."
             ))
             self.status_label.setStyleSheet(
                 "color: #fb2c36; font-weight: bold;"
