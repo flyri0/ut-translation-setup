@@ -40,6 +40,7 @@ jobs:
           windows-icon-from-ico: assets/icon.ico
           linux-icon: assets/icon.ico
           enable-plugins: pyside6
+          windows-console-mode: disable
           include-data-files: |
             assets.rcc=assets.rcc
             config.json=config.json
