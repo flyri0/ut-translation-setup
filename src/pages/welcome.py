@@ -45,9 +45,11 @@ class WelcomePage(QWidget):
             "</p><br>" +
             "<center><i>" +
             self.tr("Tradução por:") + "<br>" +
-            '<div style="display: text-align: left;">' +
-            "• Bernardo Hoffmann (PitterG4)" + "<br>" + "• Eduarda Albuquerque (Yubi)" + "<br>"
-            + "• Lucas Silva (Lucasxt)" + "<br>" + "• Gabriel Araújo (Percival)" + '</div>'
+            '<div style="display: text-align: left;">'
+            + "• " + '<a style="text-decoration: none;" href="https://discordapp.com/users/285118619506180096">Bernardo Hoffmann (PitterG4)</a>' + "<br>"
+            + "• Eduarda Albuquerque (Yubi)" + "<br>"
+            + "• " + '<a style="text-decoration: none;" href="https://br.linkedin.com/in/lucasilva09">Lucas Silva (Lucasxt)</a>' + "<br>"
+            + "• Gabriel Araújo (Percival)" + '</div>'
             + "<br><br>" +
             self.tr("Instalador por:") + "<br>" +
             '<a href="https://github.com/flyri0">flyr0</a><br>' +
@@ -58,6 +60,7 @@ class WelcomePage(QWidget):
             'href="https://github.com/flyri0/ut-translation-setup">Github</a'
             '>' +
             "</center>"
+
         )
 
         message.setWordWrap(True)
