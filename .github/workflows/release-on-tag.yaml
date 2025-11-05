@@ -3,8 +3,7 @@ name: Build with Nuitka
 on:
   push:
     tags:
-      - "*"   # only run when a tag starting with 'v' is created (e.g. v1.0.0)
-
+      - "*"
 jobs:
   build:
     strategy:
@@ -29,6 +28,10 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+
+      - name: Compile resources
+        run: |
+          pyside6-rcc --binary assets.qrc -o assets.rcc
 
       - name: Build Executable
         uses: Nuitka/Nuitka-Action@main
