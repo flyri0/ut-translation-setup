@@ -3,6 +3,7 @@ import platform
 import shutil
 import stat
 import zipfile
+from os import remove
 from pathlib import Path
 from typing import Optional
 
@@ -137,13 +138,13 @@ class InstallFilesPage(QWidget):
 
     def _on_install_finished(self):
         src = Path(self._target_path)
-        backup = src.with_name(src.name + ".bak")
         modified = Path(src.parent) / "ModifiedPCK.pck"
 
         if src.exists():
-            shutil.move(str(src), str(backup))
+            remove(str(src))
 
-        shutil.move(str(modified), str(src))
+        if modified.exists():
+            shutil.move(str(modified), str(src))
 
         self.finished.emit()
 
