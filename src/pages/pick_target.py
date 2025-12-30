@@ -6,20 +6,22 @@ import qtawesome
 import vdf
 from PySide6.QtCore import Signal, Qt, QDir
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGroupBox, \
-    QSizePolicy, QHBoxLayout, QPushButton, QFrame, QFileDialog, QMessageBox
+    QSizePolicy, QHBoxLayout, QPushButton, QFrame, QFileDialog, QMessageBox, \
+    QCheckBox
 
 
 class PickTargetPage(QWidget):
     FULL_GAME_ID = 1574820  # full game steam id
     DEMO_GAME_ID = 2296400  # demo steam id
 
-    finished = Signal(Path, bool)
+    finished = Signal(Path, bool, bool)  # target_path, is_demo, make_backup
 
     def __init__(self):
         super().__init__()
         self._ui()
         self.target_path: Path
         self.is_demo: bool
+        self.file_size: int = 0
 
     def _ui(self):
         layout = QVBoxLayout(self)
@@ -40,6 +42,14 @@ class PickTargetPage(QWidget):
         self.status_label = QLabel()
         self.status_label.setText(self.tr("UntilThen.pck não selecionado"))
         self.status_label.setStyleSheet("color: #6a7282; font-weight: bold;")
+
+        self.backup_checkbox = QCheckBox()
+        self.backup_checkbox.setChecked(True)
+        self.backup_checkbox.setEnabled(False)
+        self.backup_checkbox.setText(self.tr("Fazer backup do arquivo original"))
+        self.backup_checkbox.setToolTip(self.tr(
+            "Cria uma cópia do arquivo UntilThen.pck original antes de instalar a tradução."
+        ))
 
         self.pick_file_button = QPushButton(self.tr("Procurar..."))
         self.pick_file_button.clicked.connect(self._handle_file_pick)
@@ -83,6 +93,7 @@ class PickTargetPage(QWidget):
         layout.addWidget(path_label_box)
         layout.addWidget(buttons_frame)
         layout.addWidget(self.status_label)
+        layout.addWidget(self.backup_checkbox)
         layout.addWidget(self.next_page_button)
 
         self.pick_file_dialog = QFileDialog(parent=self)
@@ -128,7 +139,8 @@ class PickTargetPage(QWidget):
         return None
 
     def _handle_next_page(self):
-        self.finished.emit(self.target_path, self.is_demo)
+        make_backup = self.backup_checkbox.isChecked()
+        self.finished.emit(self.target_path, self.is_demo, make_backup)
 
     def _handle_quick_find(self):
         path = self._find_util_then_pck_path()
@@ -148,11 +160,13 @@ class PickTargetPage(QWidget):
             self._set_status(is_valid=True, is_demo=is_demo)
             self.target_path = path
             self.is_demo = is_demo
+            self.file_size = path.stat().st_size
             self.path_label.setText(str(path))
             self.pick_file_button.setEnabled(False)
             self.quick_find_button.setEnabled(False)
             self.next_page_button.setEnabled(True)
             self.next_page_button.setDefault(True)
+            self._update_backup_checkbox()
             return None
 
         self._set_status(is_valid=False)
@@ -170,6 +184,21 @@ class PickTargetPage(QWidget):
                 return abs_file_path
 
         return None
+
+    def _update_backup_checkbox(self):
+        size_str = self._format_file_size(self.file_size)
+        self.backup_checkbox.setText(
+            self.tr("Fazer backup do arquivo original") + f" ({size_str})"
+        )
+        self.backup_checkbox.setEnabled(True)
+
+    @staticmethod
+    def _format_file_size(size_bytes: int) -> str:
+        for unit in ["B", "KB", "MB", "GB"]:
+            if size_bytes < 1024:
+                return f"{size_bytes:.2f} {unit}"
+            size_bytes /= 1024
+        return f"{size_bytes:.2f} TB"
 
     def _set_status(self, is_valid: bool, is_demo: bool = False):
         if is_valid:
