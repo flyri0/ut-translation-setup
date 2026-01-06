@@ -20,6 +20,7 @@ class InstallFilesPage(QWidget):
         super().__init__()
         self._target_path: Optional[Path] = None
         self._is_demo: Optional[bool] = None
+        self._make_backup: bool = True
         self._total_files = 0
         self.temp_dir = QTemporaryDir()
         self._ui()
@@ -139,8 +140,11 @@ class InstallFilesPage(QWidget):
     def _on_install_finished(self):
         src = Path(self._target_path)
         modified = Path(src.parent) / "ModifiedPCK.pck"
+        backup_path = Path(src.parent) / "UntilThen.pck.backup"
 
         if src.exists():
+            if self._make_backup:
+                shutil.copy2(str(src), str(backup_path))
             remove(str(src))
 
         if modified.exists():
@@ -160,6 +164,9 @@ class InstallFilesPage(QWidget):
 
     def set_is_demo(self, is_demo: bool):
         self._is_demo = is_demo
+
+    def set_make_backup(self, make_backup: bool):
+        self._make_backup = make_backup
 
     def _on_total_files(self, total_files: int):
         self.progress_bar.setRange(0, total_files)
