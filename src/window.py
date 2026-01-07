@@ -8,9 +8,7 @@ from PySide6.QtWidgets import QMainWindow, QStackedWidget
 from src.pages.final_page import FinalPage
 from src.pages.install_files import InstallFilesPage
 from src.pages.pick_target import PickTargetPage
-from src.pages.verify_version import VerifyVersionPage
 from src.pages.welcome import WelcomePage
-
 
 class AppWindow(QMainWindow):
     def __init__(self, config):
@@ -28,10 +26,6 @@ class AppWindow(QMainWindow):
         ))
 
         self.page_stack = QStackedWidget()
-        self.verify_version_page = VerifyVersionPage(
-            setup_version=config["setup_version"],
-            repo_name=config["repository_full_name"]
-        )
         self.welcome_page = WelcomePage()
         self.pick_target_page = PickTargetPage()
         self.install_files_page = InstallFilesPage()
@@ -39,7 +33,6 @@ class AppWindow(QMainWindow):
 
         self._connect_signals()
 
-        self.page_stack.addWidget(self.verify_version_page)
         self.page_stack.addWidget(self.welcome_page)
         self.page_stack.addWidget(self.pick_target_page)
         self.page_stack.addWidget(self.install_files_page)
@@ -48,11 +41,6 @@ class AppWindow(QMainWindow):
         self.setCentralWidget(self.page_stack)
 
     def _connect_signals(self):
-        self.verify_version_page.quit.connect(self._on_quit)
-        self.verify_version_page.finished.connect(
-            self._on_finished
-        )
-
         self.welcome_page.finished.connect(self._next_page)
 
         self.pick_target_page.finished.connect(self._on_pick_target_finished)
@@ -67,9 +55,6 @@ class AppWindow(QMainWindow):
 
     def _on_quit(self):
         self.close()
-
-    def _on_finished(self):
-        self._next_page()
 
     def _next_page(self):
         index = self.page_stack.currentIndex()
