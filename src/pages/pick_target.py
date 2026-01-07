@@ -44,7 +44,7 @@ class PickTargetPage(QWidget):
         self.status_label.setStyleSheet("color: #6a7282; font-weight: bold;")
 
         self.backup_checkbox = QCheckBox()
-        self.backup_checkbox.setChecked(True)
+        self.backup_checkbox.setChecked(False)
         self.backup_checkbox.setEnabled(False)
         self.backup_checkbox.setText(self.tr("Fazer backup do arquivo original"))
         self.backup_checkbox.setToolTip(self.tr(
