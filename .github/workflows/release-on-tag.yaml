@@ -28,21 +28,34 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install -r pyinstaller
+          pip install pyinstaller
 
       - name: Compile resources
         run: |
           pyside6-rcc --binary assets.qrc -o assets.rcc
 
-      - name: Build Executable
+      - name: Build Executable (Windows)
+        if: runner.os == 'Windows'
         shell: bash
         run: |
-          pyinstaller --noconfirm --onefile --windoned \
+          pyinstaller --noconfirm --onefile --windowed \
             --icon="assets/icon.ico" \
             --name="Tradução Until Then ${{github.ref_name }} ${{ runner.os }}" \
             --paths="src" \
             --add-data="assets.rcc;." \
             --add-data="config.json;." \
+            main.py
+
+      - name: Build Executable (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          pyinstaller --noconfirm --onefile --windowed \
+            --icon="assets/icon.ico" \
+            --name="Tradução Until Then ${{github.ref_name }} ${{ runner.os }}" \
+            --paths="src" \
+            --add-data="assets.rcc:." \
+            --add-data="config.json:." \
             main.py
 
       - name: Upload Build Artifacts
@@ -73,7 +86,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/**/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}.exe
-            ./artifacts/**
+            ./artifacts/**/*.exe
+            ./artifacts/**/Tradução Until Then ${{github.ref_name }} Linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
