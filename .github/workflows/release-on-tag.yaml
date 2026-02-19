@@ -40,7 +40,7 @@ jobs:
         run: |
           pyinstaller --noconfirm --onefile --windowed \
             --icon="assets/icon.ico" \
-            --name="Tradução Until Then ${{github.ref_name }} ${{ runner.os }}" \
+            --name="Tradução Until Then ${{ github.ref_name }} ${{ runner.os }}" \
             --paths="src" \
             --add-data="assets.rcc;." \
             --add-data="config.json;." \
@@ -52,7 +52,7 @@ jobs:
         run: |
           pyinstaller --noconfirm --onefile --windowed \
             --icon="assets/icon.ico" \
-            --name="Tradução Until Then ${{github.ref_name }} ${{ runner.os }}" \
+            --name="Tradução Until Then ${{ github.ref_name }} ${{ runner.os }}" \
             --paths="src" \
             --add-data="assets.rcc:." \
             --add-data="config.json:." \
@@ -63,8 +63,8 @@ jobs:
         with:
           name: ${{ runner.os }} Build
           path: |
-            dist/Until-Then-[PT-BR]-${{github.ref_name }}-${{ runner.os }}.exe
-            dist/Until-Then-[PT-BR]-${{github.ref_name }}-${{ runner.os }}
+            dist/Until-Then-[PT-BR]-${{ github.ref_name }}-${{ runner.os }}.exe
+            dist/Until-Then-[PT-BR]-${{ github.ref_name }}-${{ runner.os }}
           include-hidden-files: true
 
   release:
@@ -86,7 +86,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/**/*.exe
-            ./artifacts/**/Until-Then-[PT-BR]-*
+            dist/Until-Then-[PT-BR]-${{ github.ref_name }}-${{ runner.os }}.exe
+            dist/Until-Then-[PT-BR]-${{ github.ref_name }}-${{ runner.os }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
