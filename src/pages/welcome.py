@@ -47,9 +47,10 @@ class WelcomePage(QWidget):
             self.tr("Tradução por:") + "<br>" +
             '<div style="display: text-align: left;">'
             + "• " + '<a style="text-decoration: none;" href="https://discordapp.com/users/285118619506180096">Bernardo Hoffmann (PitterG4)</a>' + "<br>"
-            + "• Eduarda Albuquerque (Yubi)" + "<br>"
+            + "• Gabriel Araújo (Percival)" + "<br>"
             + "• " + '<a style="text-decoration: none;" href="https://br.linkedin.com/in/lucasilva09">Lucas Silva (Lucasxt)</a>' + "<br>"
-            + "• Gabriel Araújo (Percival)" + '</div>'
+            + "• Eduarda Albuquerque (Yubi)" + "<br>"
+            + "• Cecília (Ceci)" + '</div>'
             + "<br><br>" +
             self.tr("Instalador por:") + "<br>" +
             '<a href="https://github.com/flyri0">flyr0</a><br>' +

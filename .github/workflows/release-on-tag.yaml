@@ -1,4 +1,4 @@
-name: Build with Nuitka
+name: Build with PyInstaller
 
 on:
   push:
@@ -28,34 +28,30 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+          pip install -r pyinstaller
 
       - name: Compile resources
         run: |
           pyside6-rcc --binary assets.qrc -o assets.rcc
 
       - name: Build Executable
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          nuitka-version: main
-          script-name: main.py
-          mode: onefile
-          output-file: Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}
-          windows-icon-from-ico: assets/icon.ico
-          linux-icon: assets/icon.ico
-          enable-plugins: pyside6
-          windows-console-mode: disable
-          include-data-files: |
-            assets.rcc=assets.rcc
-            config.json=config.json
-            assets/icon.ico=assets/icon.ico
+        shell: bash
+        run: |
+          pyinstaller --noconfirm --onefile --windoned \
+            --icon="assets/icon.ico" \
+            --name="Tradução Until Then ${{github.ref_name }} ${{ runner.os }}" \
+            --paths="src" \
+            --add-data="assets.rcc;." \
+            --add-data="config.json;." \
+            main.py
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }} Build
           path: |
-            build/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}.exe
-            build/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}
+            dist/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}.exe
+            dist/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}
           include-hidden-files: true
 
   release:
@@ -77,7 +73,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/**/Until-Then-PTBR-${{ runner.os }}-${{ github.ref_name }}.exe
+            ./artifacts/**/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}.exe
             ./artifacts/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
