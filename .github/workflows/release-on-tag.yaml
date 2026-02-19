@@ -63,8 +63,8 @@ jobs:
         with:
           name: ${{ runner.os }} Build
           path: |
-            dist/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}.exe
-            dist/Tradução Until Then ${{github.ref_name }} ${{ runner.os }}
+            dist/Until-Then-[PT-BR]-${{github.ref_name }}-${{ runner.os }}.exe
+            dist/Until-Then-[PT-BR]-${{github.ref_name }}-${{ runner.os }}
           include-hidden-files: true
 
   release:
@@ -87,6 +87,6 @@ jobs:
           prerelease: false
           files: |
             ./artifacts/**/*.exe
-            ./artifacts/**/Tradução Until Then ${{github.ref_name }} Linux
+            ./artifacts/**/Until-Then-[PT-BR]-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
