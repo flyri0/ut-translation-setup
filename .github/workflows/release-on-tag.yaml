@@ -34,11 +34,25 @@ jobs:
         run: |
           pyside6-rcc --binary assets.qrc -o assets.rcc
 
+      - name: Install Linux OS Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-cursor0
+
       - name: Build Executable (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
           pyinstaller --noconfirm --onefile --windowed \
+            --exclude-module PySide6.QtWebEngine \
+            --exclude-module PySide6.QtWebEngineCore \
+            --exclude-module PySide6.QtWebEngineWidgets \
+            --exclude-module PySide6.QtQml \
+            --exclude-module PySide6.QtQuick \
+            --exclude-module PySide6.QtSql \
+            --exclude-module PySide6.QtNetwork \
+            --exclude-module PySide6.Qt3DCore \
             --icon="assets/icon.ico" \
             --name="Until-Then-PTBR-${{ github.ref_name }}-${{ runner.os }}" \
             --paths="src" \
@@ -51,6 +65,15 @@ jobs:
         shell: bash
         run: |
           pyinstaller --noconfirm --onefile --windowed \
+            --exclude-module PySide6.QtWebEngine \
+            --exclude-module PySide6.QtWebEngineCore \
+            --exclude-module PySide6.QtWebEngineWidgets \
+            --exclude-module PySide6.QtQml \
+            --exclude-module PySide6.QtQuick \
+            --exclude-module PySide6.QtSql \
+            --exclude-module PySide6.QtNetwork \
+            --exclude-module PySide6.Qt3DCore \
+            --add-binary="/usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0:." \
             --icon="assets/icon.ico" \
             --name="Until-Then-PTBR-${{ github.ref_name }}-${{ runner.os }}" \
             --paths="src" \
