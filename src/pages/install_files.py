@@ -3,7 +3,6 @@ import platform
 import shutil
 import stat
 import zipfile
-from os import remove
 from pathlib import Path
 from typing import Optional
 
@@ -106,13 +105,17 @@ class InstallFilesPage(QWidget):
                 pck_explorer_bin.chmod(mode | stat.S_IXUSR)
 
         self.process = QProcess()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self._log_output)
-        self.timer.start(1000)
+           
+        self.process.readyReadStandardOutput.connect(self._read_process_output)
+        self.process.errorOccurred.connect(self._on_process_error)
+
         self.process.finished.connect(self._on_install_finished)
+        
         self.process.setProcessChannelMode(
             QProcess.ProcessChannelMode.MergedChannels
         )
+
+        self.process.setWorkingDirectory(str(pck_explorer_bin.parent.absolute().resolve()))
 
         self.process.start(
             str(pck_explorer_bin.absolute().resolve()),
@@ -126,31 +129,50 @@ class InstallFilesPage(QWidget):
             ]
         )
 
-    def _log_output(self):
-        byte_array = self.process.readLine()
-        text = byte_array.data().decode(errors="replace")
+    def _read_process_output(self):
         system = platform.system()
 
         if system == "Windows":
             self.log_widget.setVisible(False)
-            return
 
-        self.log_widget.append(text)
+        while self.process.canReadLine():
+            byte_array = self.process.readLine()
+            text = byte_array.data().decode(errors="replace").strip()
 
-    def _on_install_finished(self):
+            if text:
+                if system != "Windows":
+                    if "Error" in text or "Exception" in text or "Fail" in text:
+                        system = platform.system()
+
+    def _on_process_error(self, error):
+        self.log_widget.append_message(f"Erro: Falha ao tentar abrir o empacotador ({error})")
+
+    def _on_install_finished(self, *args):
         src = Path(self._target_path)
         modified = Path(src.parent) / "ModifiedPCK.pck"
         backup_path = Path(src.parent) / "UntilThen.pck.backup"
 
-        if src.exists():
-            if self._make_backup:
-                shutil.copy2(str(src), str(backup_path))
-            remove(str(src))
+        try:
+            if modified.exists():
+                if src.exists() and self._make_backup:
+                    if not backup_path.exists():
+                        src.replace(backup_path)
+                        self.log_widget.append_message("Sucesso: Backup do jogo foi criado.")
+                    else:
+                        self.log_widget.append_message("Sucesso: Backup original já existia e foi substituído.")
+                
+                modified.replace(src)
+                self.log_widget.append_message("Sucesso: Tradução aplicada com sucesso.")
+                self.finished.emit()
+            else:
+                self.log_widget.append_message("Erro: O arquivo de tradução não foi gerado pelo sistema.")
 
-        if modified.exists():
-            shutil.move(str(modified), str(src))
-
-        self.finished.emit()
+        except PermissionError:
+            self.log_widget.append_message("Erro: Não foi possível mover os arquivos.")
+        except OSError as e:
+            self.log_widget.append_message(f"Erro de sistema ao finalizar: {e.strerror}")
+        except Exception as e:
+            self.log_widget.append_message(f"Ocorreu um erro inesperado: {str(e)}")
 
     def _clear_feedback(self):
         self._total_files = 0
@@ -239,6 +261,7 @@ class _UnzipWorker(QObject):
 
                 count = 0
                 for info in infos:
+                    info.filename = info.filename.replace('\\', '/')
                     zf.extract(info, str(dest_dir.resolve()))
                     count += 1
                     self.progress.emit(count, info.filename)

@@ -37,6 +37,7 @@ class AppWindow(QMainWindow):
         self.page_stack.addWidget(self.pick_target_page)
         self.page_stack.addWidget(self.install_files_page)
         self.page_stack.addWidget(self.final_page)
+        self.pick_target_page.clicked_back.connect(self._go_back_to_welcome)
 
         self.setCentralWidget(self.page_stack)
 
@@ -61,6 +62,10 @@ class AppWindow(QMainWindow):
         count = self.page_stack.count()
         if index < count - 1:
             self.page_stack.setCurrentIndex(index + 1)
+            
+
+    def _go_back_to_welcome(self):
+        self.page_stack.setCurrentWidget(self.welcome_page)
 
     @staticmethod
     def _resize_with_ratio(
