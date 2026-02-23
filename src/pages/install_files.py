@@ -83,6 +83,13 @@ class InstallFilesPage(QWidget):
     def _install_files(self):
         self.status_label.setText(self.tr("Instalando arquivos de tradução..."))
         self.progress_bar.setRange(0, 0)
+        
+        modified_pck = self._target_path.parent / "ModifiedPCK.pck"
+        if modified_pck.exists():
+            try:
+                modified_pck.unlink()
+            except Exception:
+                pass
 
         system = platform.system()
         temp_dir_path = Path(self.temp_dir.path())
@@ -142,7 +149,7 @@ class InstallFilesPage(QWidget):
             if text:
                 if system != "Windows":
                     if "Error" in text or "Exception" in text or "Fail" in text:
-                        system = platform.system()
+                        self.log_widget.append_message(text)
 
     def _on_process_error(self, error):
         self.log_widget.append_message(f"Erro: Falha ao tentar abrir o empacotador ({error})")
@@ -154,18 +161,23 @@ class InstallFilesPage(QWidget):
 
         try:
             if modified.exists():
-                if src.exists() and self._make_backup:
+                if self._make_backup:
                     if not backup_path.exists():
                         src.replace(backup_path)
-                        self.log_widget.append_message("Sucesso: Backup do jogo foi criado.")
+                        self.log_widget.append_message("Sucesso: O arquivo de backup foi criado.")
                     else:
-                        self.log_widget.append_message("Sucesso: Backup original já existia e foi substituído.")
+                        if src.exists():
+                            src.unlink()
+                        self.log_widget.append_message("Aviso: O backup já existia. Nada foi alterado.")
+                else:
+                    if src.exists():
+                        src.unlink()
                 
                 modified.replace(src)
                 self.log_widget.append_message("Sucesso: Tradução aplicada com sucesso.")
                 self.finished.emit()
             else:
-                self.log_widget.append_message("Erro: O arquivo de tradução não foi gerado pelo sistema.")
+                self.log_widget.append_message("Erro: O arquivo de tradução não foi gerado pelo empacotador.")
 
         except PermissionError:
             self.log_widget.append_message("Erro: Não foi possível mover os arquivos.")
