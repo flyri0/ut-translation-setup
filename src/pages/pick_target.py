@@ -15,6 +15,7 @@ class PickTargetPage(QWidget):
     DEMO_GAME_ID = 2296400  # demo steam id
 
     finished = Signal(Path, bool, bool)  # target_path, is_demo, make_backup
+    clicked_back = Signal()
 
     def __init__(self):
         super().__init__()
@@ -24,9 +25,11 @@ class PickTargetPage(QWidget):
         self.file_size: int = 0
 
     def _ui(self):
-        layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.setContentsMargins(50, 0, 50, 0)
+        center_layout = QVBoxLayout(self)
+        center_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        center_layout.setContentsMargins(50, 0, 50, 0)
+        
+        layout = center_layout
 
         self.path_label = QLabel()
 
@@ -45,7 +48,8 @@ class PickTargetPage(QWidget):
 
         self.backup_checkbox = QCheckBox()
         self.backup_checkbox.setChecked(False)
-        self.backup_checkbox.setEnabled(False)
+        self.backup_checkbox.setDisabled(True)
+        self.backup_checkbox.toggled.connect(self._update_backup_checkbox)
         self.backup_checkbox.setText(self.tr("Fazer backup do arquivo original"))
         self.backup_checkbox.setToolTip(self.tr(
             "Cria uma cópia do arquivo UntilThen.pck original antes de instalar a tradução."
@@ -89,6 +93,12 @@ class PickTargetPage(QWidget):
             font-weight: bold;
             """
         )
+        
+        self.back_button = QPushButton(self)
+        self.back_button.setIcon(qtawesome.icon("fa6s.arrow-left"))
+        self.back_button.setFixedSize(55, 40)
+        self.back_button.clicked.connect(self._reset_page)
+        self.back_button.clicked.connect(self.clicked_back.emit)
 
         layout.addWidget(path_label_box)
         layout.addWidget(buttons_frame)
@@ -124,6 +134,27 @@ class PickTargetPage(QWidget):
         self.file_not_selected_message.setStandardButtons(
             QMessageBox.StandardButton.Ok
         )
+        
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.back_button.move(50, self.height() - self.back_button.height() - 25)
+        
+    def _reset_page(self):
+        self.target_path = None
+        self.file_size = 0
+        
+        self.path_label.setText("")
+        self.status_label.setText(self.tr("UntilThen.pck não selecionado"))
+        self.status_label.setStyleSheet("color: #6a7282; font-weight: bold;")
+        
+        self.pick_file_button.setEnabled(True)
+        self.quick_find_button.setEnabled(True)
+        
+        self.next_page_button.setEnabled(False)
+        self.backup_checkbox.setChecked(False)
+        self.backup_checkbox.setDisabled(True)
+        
+        self._update_backup_checkbox()
 
     def _handle_file_pick(self):
         self.pick_file_dialog.exec()
@@ -166,6 +197,7 @@ class PickTargetPage(QWidget):
             self.quick_find_button.setEnabled(False)
             self.next_page_button.setEnabled(True)
             self.next_page_button.setDefault(True)
+            self.backup_checkbox.setEnabled(True)
             self._update_backup_checkbox()
             return None
 
@@ -186,11 +218,14 @@ class PickTargetPage(QWidget):
         return None
 
     def _update_backup_checkbox(self):
+        base_text = self.tr("Fazer backup do arquivo original")
         size_str = self._format_file_size(self.file_size)
-        self.backup_checkbox.setText(
-            self.tr("Fazer backup do arquivo original") + f" ({size_str})"
-        )
-        self.backup_checkbox.setEnabled(True)
+        
+        if self.backup_checkbox.isChecked():
+            self.backup_checkbox.setText(f"{base_text} (ocupará mais {size_str})")
+            
+        else:
+            self.backup_checkbox.setText(base_text)
 
     @staticmethod
     def _format_file_size(size_bytes: int) -> str:
