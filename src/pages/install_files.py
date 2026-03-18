@@ -22,12 +22,16 @@ class InstallFilesPage(QWidget):
         self._make_backup: bool = True
         self._total_files = 0
         self.temp_dir = QTemporaryDir()
+        self._process_started = False
+        self._last_logs = []
         self._ui()
 
     def showEvent(self, event) -> None:
         super().showEvent(event)
-
-        self._unzip_translation_files()
+        
+        if not self._process_started:
+            self._process_started = True
+            self._unzip_translation_files()
 
     def _ui(self):
         layout = QVBoxLayout(self)
@@ -138,23 +142,23 @@ class InstallFilesPage(QWidget):
 
     def _read_process_output(self):
         system = platform.system()
-
-        if system == "Windows":
-            self.log_widget.setVisible(False)
-
+        
         while self.process.canReadLine():
             byte_array = self.process.readLine()
             text = byte_array.data().decode(errors="replace").strip()
 
             if text:
-                if system != "Windows":
-                    if "Error" in text or "Exception" in text or "Fail" in text:
-                        self.log_widget.append_message(text)
+                self._last_logs.append(text)
+                if len(self._last_logs) > 5:
+                    self._last_logs.pop(0)
+                    
+                if "Error" in text or "Exception" in text or "Fail" in text:
+                    self.log_widget.append_message(text)
 
     def _on_process_error(self, error):
         self.log_widget.append_message(f"Erro: Falha ao tentar abrir o empacotador ({error})")
 
-    def _on_install_finished(self, *args):
+    def _on_install_finished(self, exit_code, exit_status):
         src = Path(self._target_path)
         modified = Path(src.parent) / "ModifiedPCK.pck"
         backup_path = Path(src.parent) / "UntilThen.pck.backup"
@@ -177,10 +181,12 @@ class InstallFilesPage(QWidget):
                 self.log_widget.append_message("Sucesso: Tradução aplicada com sucesso.")
                 self.finished.emit()
             else:
-                self.log_widget.append_message("Erro: O arquivo de tradução não foi gerado pelo empacotador.")
+                self.log_widget.append_message(f"Erro: O arquivo de tradução não foi gerado pelo empacotador.\nCódigo: {exit_code}")
+                for msg in self._last_logs:
+                    self.log_widget.append_message(f"> {msg}")
 
         except PermissionError:
-            self.log_widget.append_message("Erro: Não foi possível mover os arquivos.")
+            self.log_widget.append_message("Erro: Permissão negada ao mover/renomear os arquivos")
         except OSError as e:
             self.log_widget.append_message(f"Erro de sistema ao finalizar: {e.strerror}")
         except Exception as e:
